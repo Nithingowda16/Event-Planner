@@ -1,0 +1,35 @@
+.celebrate-spinner {
+  display: inline-block;
+  vertical-align: middle;
+  animation: celebrate-spin 0.8s linear infinite;
+}
+
+@keyframes celebrate-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.celebrate-spinner--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.celebrate-spinner--md {
+  width: 20px;
+  height: 20px;
+}
+
+.celebrate-spinner--lg {
+  width: 32px;
+  height: 32px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebrate-spinner {
+    animation-duration: 2s;
+  }
+}

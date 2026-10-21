@@ -1,0 +1,109 @@
+.celebrate-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  width: 100%;
+}
+
+.celebrate-input-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.celebrate-input-required {
+  color: var(--accent-rose);
+}
+
+.celebrate-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.celebrate-input-control {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  min-height: 42px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.celebrate-input-control::placeholder {
+  color: var(--text-muted);
+}
+
+.celebrate-input-control:hover:not(:disabled) {
+  border-color: var(--border-highlight);
+}
+
+.celebrate-input-control:focus-visible {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 2px var(--accent-gold-soft);
+}
+
+.celebrate-input-control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--bg-surface);
+}
+
+.celebrate-input-control--has-left-icon {
+  padding-left: var(--space-10);
+}
+
+.celebrate-input-control--has-right-icon {
+  padding-right: var(--space-10);
+}
+
+.celebrate-input-icon-left,
+.celebrate-input-icon-right {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  pointer-events: none;
+  width: 36px;
+  height: 100%;
+}
+
+.celebrate-input-icon-left {
+  left: 0;
+}
+
+.celebrate-input-icon-right {
+  right: 0;
+}
+
+/* Error State */
+.celebrate-input-control--error {
+  border-color: var(--accent-rose) !important;
+}
+
+.celebrate-input-control--error:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-rose-soft);
+}
+
+.celebrate-input-error {
+  font-size: var(--font-size-xs);
+  color: var(--accent-rose);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.celebrate-input-helper {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}

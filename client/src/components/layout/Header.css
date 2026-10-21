@@ -1,0 +1,116 @@
+.celebrate-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: border-color var(--transition-fast);
+}
+
+.celebrate-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+  gap: var(--space-4);
+}
+
+.celebrate-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.celebrate-brand__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0a0e17;
+  box-shadow: var(--shadow-glow-gold);
+  flex-shrink: 0;
+}
+
+.celebrate-brand__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.celebrate-brand__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-extrabold);
+  margin: 0;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 60%, var(--accent-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.celebrate-brand__tagline {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Navigation */
+.celebrate-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.celebrate-nav__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.celebrate-nav__link:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-elevated);
+}
+
+.celebrate-nav__link--active {
+  color: var(--accent-gold);
+  background-color: var(--accent-gold-soft);
+  font-weight: var(--font-weight-semibold);
+}
+
+.celebrate-nav__link:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Actions */
+.celebrate-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+@media (max-width: 840px) {
+  .celebrate-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 540px) {
+  .celebrate-brand__tagline {
+    display: none;
+  }
+}

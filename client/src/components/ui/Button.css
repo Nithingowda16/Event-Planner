@@ -1,0 +1,109 @@
+.celebrate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  position: relative;
+  user-select: none;
+}
+
+.celebrate-btn:disabled,
+.celebrate-btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Sizes */
+.celebrate-btn--sm {
+  font-size: var(--font-size-xs);
+  padding: var(--space-1-5) var(--space-3);
+  min-height: 32px;
+}
+
+.celebrate-btn--md {
+  font-size: var(--font-size-sm);
+  padding: var(--space-2) var(--space-4);
+  min-height: 40px;
+}
+
+.celebrate-btn--lg {
+  font-size: var(--font-size-base);
+  padding: var(--space-3) var(--space-6);
+  min-height: 48px;
+}
+
+/* Full Width */
+.celebrate-btn--full {
+  width: 100%;
+}
+
+/* Variants */
+.celebrate-btn--primary {
+  background: linear-gradient(135deg, var(--accent-gold), #d97706);
+  color: #0a0e17;
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.celebrate-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fbbf24, var(--accent-gold));
+  box-shadow: var(--shadow-glow-gold);
+  transform: translateY(-1px);
+}
+
+.celebrate-btn--secondary {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.celebrate-btn--secondary:hover:not(:disabled) {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-highlight);
+  color: #ffffff;
+}
+
+.celebrate-btn--outline {
+  background-color: transparent;
+  color: var(--accent-gold);
+  border-color: var(--accent-gold-border);
+}
+
+.celebrate-btn--outline:hover:not(:disabled) {
+  background-color: var(--accent-gold-soft);
+  border-color: var(--accent-gold);
+}
+
+.celebrate-btn--danger {
+  background-color: #e11d48;
+  color: #ffffff;
+}
+
+.celebrate-btn--danger:hover:not(:disabled) {
+  background-color: #be123c;
+}
+
+.celebrate-btn--ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+}
+
+.celebrate-btn--ghost:hover:not(:disabled) {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+}
+
+/* Keyboard Accessibility */
+.celebrate-btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}

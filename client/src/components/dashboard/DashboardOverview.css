@@ -1,0 +1,50 @@
+.celebrate-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.celebrate-stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.celebrate-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.celebrate-stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.celebrate-stat-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.celebrate-stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin: var(--space-0-5) 0 0 0;
+}
+
+.celebrate-stat-subtext {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: var(--space-0-5) 0 0 0;
+}

@@ -1,12 +1,18 @@
 @import './tokens.css';
 
-*, *::before, *::after {
+/* ==========================================================================
+   Base Reset & Box Sizing
+   ========================================================================== */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }
@@ -15,17 +21,38 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Typography Standards
+   ========================================================================== */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--text-primary);
+  line-height: var(--line-height-tight);
   letter-spacing: -0.02em;
+}
+
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
+
+p {
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
 }
 
 a {
@@ -38,21 +65,109 @@ a:hover {
   color: var(--accent-gold-hover);
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
 }
 
-/* Accessibility: Consistent, High-Visibility Keyboard Focus Indicators */
+/* ==========================================================================
+   Accessibility Utilities (WCAG 2.1 AA)
+   ========================================================================== */
+
+/* Visible Focus Indicator */
 :focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-offset);
 }
 
-/* Utility Containers */
+/* Skip-to-Content Link */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: var(--space-4);
+  z-index: 9999;
+  background-color: var(--accent-gold);
+  color: var(--text-inverse);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  box-shadow: var(--shadow-lg);
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Screen-Reader Only Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focusable when navigated via Tab */
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ==========================================================================
+   Layout Containers & Utilities
+   ========================================================================== */
 .container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 0 var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--space-8);
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-highlight);
 }

@@ -1,0 +1,66 @@
+.celebrate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.celebrate-badge--sm {
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2);
+}
+
+.celebrate-badge--md {
+  font-size: var(--font-size-sm);
+  padding: var(--space-1-5) var(--space-3);
+}
+
+/* Variant Styles - WCAG 2.1 AA high contrast */
+.celebrate-badge--gold {
+  background-color: var(--accent-gold-soft);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.celebrate-badge--emerald {
+  background-color: var(--accent-emerald-soft);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.celebrate-badge--purple {
+  background-color: var(--accent-purple-soft);
+  color: #c4b5fd;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+}
+
+.celebrate-badge--rose {
+  background-color: var(--accent-rose-soft);
+  color: #fda4af;
+  border: 1px solid rgba(251, 113, 133, 0.35);
+}
+
+.celebrate-badge--blue {
+  background-color: var(--accent-blue-soft);
+  color: #93c5fd;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+}
+
+.celebrate-badge--neutral {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-medium);
+}
+
+.celebrate-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
