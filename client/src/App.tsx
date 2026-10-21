@@ -11,7 +11,7 @@ import { AuthModal } from './components/auth/AuthModal.js';
 import { ToastProvider, useToast } from './components/ui/ToastContext.js';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { ThemeProvider } from './context/ThemeContext.js';
-import { api, ApiError } from './services/api.js';
+import { api, ApiError, API_BASE_URL } from './services/api.js';
 import './styles/global.css';
 
 const AppContent: React.FC = () => {
@@ -55,7 +55,8 @@ const AppContent: React.FC = () => {
   const checkHealth = useCallback(async () => {
     setBackendStatus('checking');
     try {
-      const res = await fetch('/api/health');
+      const endpoint = `${API_BASE_URL}/api/health`;
+      const res = await fetch(endpoint);
       if (res.ok) {
         setBackendStatus('connected');
       } else {

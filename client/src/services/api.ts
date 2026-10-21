@@ -70,6 +70,11 @@ export const tokenStorage = {
   },
 };
 
+export const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL
+  ? String(import.meta.env.VITE_API_URL)
+  : ''
+).replace(/\/$/, '');
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = tokenStorage.get();
   const headers: Record<string, string> = {
@@ -81,17 +86,37 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(endpoint, {
-    ...options,
-    headers,
-  });
+  const url = endpoint.startsWith('http')
+    ? endpoint
+    : `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...options,
+      headers,
+    });
+  } catch (_netErr: unknown) {
+    throw new ApiError(
+      0,
+      'Unable to connect to the backend server. Please check your internet connection or backend server status.'
+    );
+  }
 
   const contentType = res.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');
   const data = isJson ? await res.json() : null;
 
   if (!res.ok) {
-    const errorMsg = data?.message || data?.error || `HTTP error ${res.status}`;
+    let errorMsg = data?.message || data?.error;
+    if (!errorMsg) {
+      if (res.status === 404) {
+        errorMsg =
+          'API endpoint not found (404). If running on Netlify, please deploy the backend server (Render/Railway) or set the VITE_API_URL environment variable.';
+      } else {
+        errorMsg = `HTTP error ${res.status}`;
+      }
+    }
     throw new ApiError(res.status, errorMsg, data);
   }
 

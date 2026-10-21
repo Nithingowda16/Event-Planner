@@ -1,7 +1,17 @@
+
 [build]
   base = "."
-  command = "npm run --workspace=@celebrateos/shared build && npm run --workspace=@celebrateos/client build"
+  command = "npm run --workspace=@celebrateos/shared build && npm run --workspace=@celebrateos/server build && npm run --workspace=@celebrateos/client build"
   publish = "client/dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
 
 [[redirects]]
   from = "/*"
