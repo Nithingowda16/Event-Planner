@@ -10,6 +10,7 @@ export interface IPlanProposal extends Document {
   proposedChanges: ProposedChangesPayload;
   diffSnapshot?: Record<string, unknown>;
   status: ProposalStatus;
+  isApplying?: boolean;
   reviewedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -49,6 +50,11 @@ const PlanProposalSchema = new Schema<IPlanProposal>(
       type: String,
       enum: ['pending', 'applied', 'rejected', 'stale'],
       default: 'pending',
+      index: true,
+    },
+    isApplying: {
+      type: Boolean,
+      default: false,
       index: true,
     },
     reviewedAt: {

@@ -186,7 +186,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({ eventId, currency, event
         <CardHeader>
           <CardTitle as="h3">Budget Categories & Allocations</CardTitle>
           <Badge variant="gold" size="sm">
-            {budget.items.length} Categories
+            {(budget.items?.length || 0)} Categories
           </Badge>
         </CardHeader>
 
@@ -203,7 +203,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({ eventId, currency, event
               </tr>
             </thead>
             <tbody>
-              {budget.items.map((item) => (
+              {(budget.items || []).map((item) => (
                 <tr key={item.id}>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>

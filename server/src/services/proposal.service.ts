@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { PlanProposal, type IPlanProposal } from '../models/plan-proposal.model.js';
 import { Event } from '../models/event.model.js';
-import { Task } from '../models/task.model.js';
+import { Task, type ITask } from '../models/task.model.js';
 import { calculateAuthoritativeBudget, type PlanProposalEntity, type ProposedChangesPayload, type EventEntity } from '@celebrateos/shared';
 import * as geminiService from './gemini.service.js';
 import * as diffService from './diff.service.js';
@@ -222,6 +222,7 @@ export async function validateProposalForApproval(
   if (versionMismatch) {
     // Mark proposal as stale to prevent future race conditions
     proposal.status = 'stale';
+    proposal.isApplying = false;
     proposal.reviewedAt = new Date();
     await proposal.save();
 
@@ -237,7 +238,7 @@ export async function validateProposalForApproval(
 
 /**
  * Approves and atomically applies proposal changes to the active event.
- * Uses version-aware concurrency checks and only marks proposal applied if event save succeeds.
+ * Enforces atomic concurrency locking, version checks, and transactional/compensating rollback.
  */
 export async function approveProposal(
   userId: string,
@@ -245,76 +246,163 @@ export async function approveProposal(
   proposalId: string,
   expectedVersion?: number
 ): Promise<{ event: EventEntity; proposal: PlanProposalEntity }> {
-  const { proposal, event } = await validateProposalForApproval(userId, proposalId, expectedVersion);
+  if (!mongoose.Types.ObjectId.isValid(proposalId) || !mongoose.Types.ObjectId.isValid(eventId)) {
+    throw new ProposalServiceError(404, 'Invalid event or proposal ID');
+  }
 
-  if (event._id.toString() !== eventId || proposal.eventId.toString() !== eventId) {
+  // 1. Concurrency Defense: Atomically acquire lock on proposal
+  const claimedProposal = await PlanProposal.findOneAndUpdate(
+    {
+      _id: new mongoose.Types.ObjectId(proposalId),
+      userId: new mongoose.Types.ObjectId(userId),
+      eventId: new mongoose.Types.ObjectId(eventId),
+      status: 'pending',
+      isApplying: { $ne: true },
+    },
+    { $set: { isApplying: true } },
+    { new: true }
+  );
+
+  if (!claimedProposal) {
+    const existing = await PlanProposal.findOne({
+      _id: new mongoose.Types.ObjectId(proposalId),
+      userId: new mongoose.Types.ObjectId(userId),
+    });
+
+    if (!existing) {
+      throw new ProposalServiceError(404, 'Proposal not found');
+    }
+    if (existing.eventId.toString() !== eventId) {
+      throw new ProposalServiceError(404, 'Proposal does not belong to specified event');
+    }
+    if (existing.isApplying) {
+      throw new ProposalServiceError(409, 'Proposal is currently being approved by another concurrent request.');
+    }
+    throw new ProposalServiceError(
+      400,
+      `Cannot review proposal with status "${existing.status}". Only pending proposals can be reviewed.`
+    );
+  }
+
+  // 2. Validate event and version concurrency
+  let eventDoc: InstanceType<typeof Event>;
+  try {
+    const validated = await validateProposalForApproval(userId, proposalId, expectedVersion);
+    eventDoc = validated.event;
+  } catch (validationErr) {
+    claimedProposal.isApplying = false;
+    await claimedProposal.save();
+    throw validationErr;
+  }
+
+  if (eventDoc._id.toString() !== eventId) {
+    claimedProposal.isApplying = false;
+    await claimedProposal.save();
     throw new ProposalServiceError(404, 'Proposal does not belong to specified event');
   }
 
-  // 1. Apply budget deltas
-  if (proposal.proposedChanges.budgetDeltas && proposal.proposedChanges.budgetDeltas.length > 0) {
-    const categories = proposal.proposedChanges.budgetDeltas.map((d) => ({
-      category: d.category,
-      allocatedAmount: d.proposedAmount,
-      isLocked: false,
-      rationale: d.rationale,
-    }));
+  // 3. Atomicity & Compensating Rollback
+  const createdTaskIds: mongoose.Types.ObjectId[] = [];
+  const deletedTaskBackups: Array<Partial<ITask>> = [];
 
-    const budgetResult = calculateAuthoritativeBudget({
-      totalBudget: event.totalBudget,
-      currency: event.currency,
-      categories,
-    });
-
-    if (budgetResult.success) {
-      event.budgetItems = budgetResult.items.map((i) => ({
-        category: i.category,
-        percentageOfTotal: i.percentageOfTotal,
-        allocatedAmount: i.allocatedAmount,
-        allocatedAmountMinor: i.allocatedAmountMinor,
-        actualSpent: 0,
-        actualSpentMinor: 0,
-        isLocked: i.isLocked,
-        rationale: i.rationale,
+  try {
+    // 3a. Apply budget deltas
+    if (claimedProposal.proposedChanges.budgetDeltas && claimedProposal.proposedChanges.budgetDeltas.length > 0) {
+      const categories = claimedProposal.proposedChanges.budgetDeltas.map((d) => ({
+        category: d.category,
+        allocatedAmount: d.proposedAmount,
+        isLocked: false,
+        rationale: d.rationale,
       }));
-    }
-  }
 
-  // 2. Apply task changes
-  if (proposal.proposedChanges.taskChanges && proposal.proposedChanges.taskChanges.length > 0) {
-    for (const change of proposal.proposedChanges.taskChanges) {
-      if (change.action === 'add') {
-        await Task.create({
-          eventId: event._id,
-          userId: event.userId,
-          phase: change.phase,
-          title: change.title.trim(),
-          description: change.description,
-          priority: change.priority || 'medium',
-          status: 'pending',
-        });
-      } else if (change.action === 'remove' && change.targetTaskId && mongoose.Types.ObjectId.isValid(change.targetTaskId)) {
-        await Task.deleteOne({
-          _id: new mongoose.Types.ObjectId(change.targetTaskId),
-          eventId: event._id,
-          userId: event.userId,
-        });
+      const budgetResult = calculateAuthoritativeBudget({
+        totalBudget: eventDoc.totalBudget,
+        currency: eventDoc.currency,
+        categories,
+      });
+
+      if (budgetResult.success) {
+        eventDoc.budgetItems = budgetResult.items.map((i) => ({
+          category: i.category,
+          percentageOfTotal: i.percentageOfTotal,
+          allocatedAmount: i.allocatedAmount,
+          allocatedAmountMinor: i.allocatedAmountMinor,
+          actualSpent: 0,
+          actualSpentMinor: 0,
+          isLocked: i.isLocked,
+          rationale: i.rationale,
+        }));
       }
     }
+
+    // 3b. Apply task changes
+    if (claimedProposal.proposedChanges.taskChanges && claimedProposal.proposedChanges.taskChanges.length > 0) {
+      for (const change of claimedProposal.proposedChanges.taskChanges) {
+        if (change.action === 'add') {
+          const newTask = await Task.create({
+            eventId: eventDoc._id,
+            userId: eventDoc.userId,
+            phase: change.phase,
+            title: change.title.trim(),
+            description: change.description,
+            priority: change.priority || 'medium',
+            status: 'pending',
+          });
+          createdTaskIds.push(newTask._id);
+        } else if (change.action === 'remove' && change.targetTaskId && mongoose.Types.ObjectId.isValid(change.targetTaskId)) {
+          const taskToDelete = await Task.findOne({
+            _id: new mongoose.Types.ObjectId(change.targetTaskId),
+            eventId: eventDoc._id,
+            userId: eventDoc.userId,
+          });
+          if (taskToDelete) {
+            deletedTaskBackups.push(taskToDelete.toObject());
+            await Task.deleteOne({ _id: taskToDelete._id });
+          }
+        }
+      }
+    }
+
+    // 3c. Save event first (enforces optimisticConcurrency)
+    await eventDoc.save();
+
+    // 3d. Mark proposal applied ONLY after event save succeeds
+    claimedProposal.status = 'applied';
+    claimedProposal.isApplying = false;
+    claimedProposal.reviewedAt = new Date();
+    await claimedProposal.save();
+
+    return {
+      event: toEventEntity(eventDoc),
+      proposal: toProposalEntity(claimedProposal),
+    };
+  } catch (err: unknown) {
+    // Compensating rollback: Revert all task mutations
+    if (createdTaskIds.length > 0) {
+      await Task.deleteMany({ _id: { $in: createdTaskIds } });
+    }
+    if (deletedTaskBackups.length > 0) {
+      await Task.insertMany(deletedTaskBackups);
+    }
+
+    // Release concurrency lock on proposal
+    try {
+      claimedProposal.isApplying = false;
+      await claimedProposal.save();
+    } catch {
+      // ignore
+    }
+
+    if (err && typeof err === 'object' && (err as { name?: string }).name === 'VersionError') {
+      throw new ProposalServiceError(
+        409,
+        'Conflict: Event was updated concurrently by another operation while applying proposal.',
+        { currentEventVersion: eventDoc.__v }
+      );
+    }
+
+    throw err;
   }
-
-  // 3. Save event first (increments __v via Mongoose optimisticConcurrency)
-  await event.save();
-
-  // 4. Mark proposal applied ONLY after event save succeeds
-  proposal.status = 'applied';
-  proposal.reviewedAt = new Date();
-  await proposal.save();
-
-  return {
-    event: toEventEntity(event),
-    proposal: toProposalEntity(proposal),
-  };
 }
 
 /**

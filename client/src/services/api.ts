@@ -16,6 +16,9 @@ import type {
   TimelineTaskEntity,
   VendorQuotationEntity,
   PaginatedResponse,
+  PlanProposalEntity,
+  AIRevisionRequestInput,
+  AIGeneratePlanInput,
 } from '@celebrateos/shared';
 
 export class ApiError extends Error {
@@ -237,6 +240,77 @@ export const api = {
     async delete(eventId: string, vendorId: string): Promise<{ message: string }> {
       return request<{ message: string }>(`/api/v1/events/${eventId}/vendors/${vendorId}`, {
         method: 'DELETE',
+      });
+    },
+  },
+
+  // AI Plan Generation & Revision Proposals
+  ai: {
+    async generatePlan(
+      eventId: string,
+      input?: AIGeneratePlanInput
+    ): Promise<{
+      event: EventEntity;
+      themeConcept: string;
+      executiveSummary: string;
+      tasksCreatedCount: number;
+      vendorChecklist: Array<{
+        category: string;
+        estimatedCostPercentage: number;
+        keyDeliverables: string;
+      }>;
+    }> {
+      return request(`/api/v1/events/${eventId}/ai/generate`, {
+        method: 'POST',
+        body: JSON.stringify(input || {}),
+      });
+    },
+    async proposeRevision(
+      eventId: string,
+      input: AIRevisionRequestInput
+    ): Promise<{
+      proposal: PlanProposalEntity;
+      diffSnapshot: Record<string, unknown>;
+    }> {
+      return request(`/api/v1/events/${eventId}/ai/propose-revision`, {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+    },
+    async listProposals(eventId: string): Promise<{ proposals: PlanProposalEntity[] }> {
+      return request<{ proposals: PlanProposalEntity[] }>(`/api/v1/events/${eventId}/ai/proposals`);
+    },
+    async getProposal(
+      eventId: string,
+      proposalId: string
+    ): Promise<{
+      proposal: PlanProposalEntity & { diffSnapshot?: Record<string, unknown> };
+    }> {
+      return request(`/api/v1/events/${eventId}/ai/proposals/${proposalId}`);
+    },
+    async approveProposal(
+      eventId: string,
+      proposalId: string,
+      expectedVersion?: number
+    ): Promise<{
+      message: string;
+      event: EventEntity;
+      proposal: PlanProposalEntity;
+    }> {
+      return request(`/api/v1/events/${eventId}/ai/proposals/${proposalId}/approve`, {
+        method: 'POST',
+        body: JSON.stringify({ expectedVersion }),
+      });
+    },
+    async rejectProposal(
+      eventId: string,
+      proposalId: string
+    ): Promise<{
+      message: string;
+      proposal: PlanProposalEntity;
+    }> {
+      return request(`/api/v1/events/${eventId}/ai/proposals/${proposalId}/reject`, {
+        method: 'POST',
       });
     },
   },

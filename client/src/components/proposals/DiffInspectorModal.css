@@ -1,0 +1,280 @@
+/* Diff Inspector Modal Styles */
+
+.diff-inspector-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  color: var(--text-primary);
+}
+
+/* Stale Conflict Banner */
+.diff-stale-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--accent-amber-soft);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.diff-stale-banner strong {
+  color: var(--accent-amber);
+}
+
+/* Status & Version Header */
+.diff-meta-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.diff-version-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.diff-version-pill {
+  padding: 2px 8px;
+  background-color: var(--surface-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+/* Summary Card */
+.diff-summary-card {
+  padding: var(--space-4);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.diff-summary-prompt {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.diff-summary-prompt span {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.diff-summary-text {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Metric Counters */
+.diff-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-3);
+}
+
+.diff-metric-card {
+  padding: var(--space-3);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.diff-metric-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-display);
+  line-height: 1.2;
+}
+
+.diff-metric-value.positive {
+  color: var(--accent-emerald);
+}
+
+.diff-metric-value.negative {
+  color: var(--accent-rose);
+}
+
+.diff-metric-value.neutral {
+  color: var(--text-secondary);
+}
+
+.diff-metric-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+/* Tab Navigation */
+.diff-tab-nav {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: var(--space-2);
+}
+
+.diff-tab-btn {
+  padding: var(--space-2) var(--space-3);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all var(--transition-fast);
+}
+
+.diff-tab-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-card);
+}
+
+.diff-tab-btn.active {
+  color: var(--accent-purple);
+  background-color: var(--accent-purple-soft);
+}
+
+/* Budget Diff Table */
+.diff-budget-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--font-size-xs);
+}
+
+.diff-budget-table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: var(--font-weight-semibold);
+}
+
+.diff-budget-table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.diff-budget-table tr:last-child td {
+  border-bottom: none;
+}
+
+.diff-delta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.diff-delta-badge.increased {
+  background-color: var(--accent-emerald-soft);
+  color: var(--accent-emerald);
+}
+
+.diff-delta-badge.decreased {
+  background-color: var(--accent-rose-soft);
+  color: var(--accent-rose);
+}
+
+.diff-delta-badge.unchanged {
+  background-color: var(--surface-card);
+  color: var(--text-muted);
+}
+
+/* Tasks Diff List */
+.diff-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.diff-task-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--surface-card);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+}
+
+.diff-task-item.added {
+  border-left-color: var(--accent-emerald);
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.diff-task-item.removed {
+  border-left-color: var(--accent-rose);
+  background-color: rgba(244, 63, 94, 0.05);
+}
+
+.diff-task-item.modified {
+  border-left-color: var(--accent-amber);
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+.diff-task-title {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.diff-task-desc {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Vendor Suggestions */
+.diff-vendor-ideas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.diff-vendor-idea-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* Consequence Notice in Footer */
+.diff-footer-consequence {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-align: right;
+  width: 100%;
+  margin-bottom: var(--space-2);
+}

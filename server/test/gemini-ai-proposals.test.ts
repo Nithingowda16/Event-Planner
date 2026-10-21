@@ -362,6 +362,88 @@ describe('Milestone 4: Gemini AI Integration Service, Schema Validation & Propos
 
       expect(getProposalRes.body.proposal.status).toBe('stale');
     });
+
+    it('concurrent approval requests prevent race condition and double-application', async () => {
+      setGeminiMockHandler(async () => JSON.stringify(validMockRevision));
+
+      const { token } = await createAuthenticatedUser('concurtester@test.com', 'Concurrent Tester');
+
+      const createRes = await request(app)
+        .post('/api/v1/events')
+        .set('Authorization', `Bearer ${token}`)
+        .send(baseEventPayload);
+
+      const eventId = createRes.body.event.id;
+
+      const propRes = await request(app)
+        .post(`/api/v1/events/${eventId}/ai/propose-revision`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ userPrompt: 'Add swing band' });
+
+      const proposalId = propRes.body.proposal.id;
+
+      // Fire 2 concurrent approval requests simultaneously
+      const [res1, res2] = await Promise.all([
+        request(app)
+          .post(`/api/v1/events/${eventId}/ai/proposals/${proposalId}/approve`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ expectedVersion: 0 }),
+        request(app)
+          .post(`/api/v1/events/${eventId}/ai/proposals/${proposalId}/approve`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ expectedVersion: 0 }),
+      ]);
+
+      const statuses = [res1.status, res2.status].sort();
+      expect(statuses[0]).toBe(200);
+      expect([400, 409]).toContain(statuses[1]);
+
+      // Check tasks count: tasks from revision should only be applied ONCE
+      const tasksRes = await request(app)
+        .get(`/api/v1/events/${eventId}/tasks`)
+        .set('Authorization', `Bearer ${token}`);
+
+      const addedTasks = tasksRes.body.tasks.filter((t: { title: string }) => t.title === 'Book 6-Piece Live Swing Band');
+      expect(addedTasks.length).toBe(1);
+    });
+
+    it('compensating rollback ensures zero task leaks if approval fails during version save', async () => {
+      setGeminiMockHandler(async () => JSON.stringify(validMockRevision));
+
+      const { token } = await createAuthenticatedUser('rollbacktester@test.com', 'Rollback Tester');
+
+      const createRes = await request(app)
+        .post('/api/v1/events')
+        .set('Authorization', `Bearer ${token}`)
+        .send(baseEventPayload);
+
+      const eventId = createRes.body.event.id;
+
+      const propRes = await request(app)
+        .post(`/api/v1/events/${eventId}/ai/propose-revision`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ userPrompt: 'Add swing band' });
+
+      const proposalId = propRes.body.proposal.id;
+
+      // Artificially modify event version right before approval to trigger conflict
+      await Event.updateOne({ _id: eventId }, { $set: { __v: 99 } });
+
+      const approveRes = await request(app)
+        .post(`/api/v1/events/${eventId}/ai/proposals/${proposalId}/approve`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ expectedVersion: 0 });
+
+      expect(approveRes.status).toBe(409);
+
+      // Verify no tasks from the proposal were left orphaned
+      const tasksRes = await request(app)
+        .get(`/api/v1/events/${eventId}/tasks`)
+        .set('Authorization', `Bearer ${token}`);
+
+      const addedTasks = tasksRes.body.tasks.filter((t: { title: string }) => t.title === 'Book 6-Piece Live Swing Band');
+      expect(addedTasks.length).toBe(0);
+    });
   });
 
   describe('5. Proposal Rejection & Cross-User Security', () => {

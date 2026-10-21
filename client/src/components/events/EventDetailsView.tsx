@@ -10,14 +10,19 @@ import {
   Settings,
   Edit,
   Trash2,
+  Sparkles,
+  Layers,
 } from 'lucide-react';
-import type { EventEntity } from '@celebrateos/shared';
+import type { EventEntity, PlanProposalEntity } from '@celebrateos/shared';
 import { Button } from '../ui/Button.js';
 import { Badge } from '../ui/Badge.js';
 import { BudgetView } from '../budget/BudgetView.js';
 import { TimelineView } from '../timeline/TimelineView.js';
 import { VendorsView } from '../vendors/VendorsView.js';
 import { EditEventModal } from './EditEventModal.js';
+import { RequestRevisionModal } from '../proposals/RequestRevisionModal.js';
+import { DiffInspectorModal } from '../proposals/DiffInspectorModal.js';
+import { ProposalsListModal } from '../proposals/ProposalsListModal.js';
 import { api, ApiError } from '../../services/api.js';
 import { useToast } from '../ui/ToastContext.js';
 import './EventDetailsView.css';
@@ -36,9 +41,15 @@ export const EventDetailsView: React.FC<EventDetailsViewProps> = ({
   onEventDeleted,
 }) => {
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState<'budget' | 'timeline' | 'vendors' | 'overview'>('budget');
+  const [activeTab, setActiveTab] = useState<'budget' | 'timeline' | 'vendors' | 'proposals' | 'overview'>('budget');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Proposal Modals State
+  const [isRequestRevisionOpen, setIsRequestRevisionOpen] = useState(false);
+  const [isProposalsListOpen, setIsProposalsListOpen] = useState(false);
+  const [isDiffModalOpen, setIsDiffModalOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<(PlanProposalEntity & { diffSnapshot?: Record<string, unknown> }) | null>(null);
 
   const formattedDate = new Date(event.eventDate).toLocaleDateString('en-US', {
     weekday: 'short',
@@ -121,7 +132,27 @@ export const EventDetailsView: React.FC<EventDetailsViewProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+          <Button
+            variant="primary"
+            size="sm"
+            leftIcon={<Sparkles size={15} />}
+            onClick={() => setIsRequestRevisionOpen(true)}
+            id="request-ai-revision-btn"
+          >
+            Request AI Revision
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            leftIcon={<Layers size={15} />}
+            onClick={() => setIsProposalsListOpen(true)}
+            id="view-proposals-history-btn"
+          >
+            AI Proposals
+          </Button>
+
           <Button
             variant="secondary"
             size="sm"
@@ -178,6 +209,16 @@ export const EventDetailsView: React.FC<EventDetailsViewProps> = ({
 
         <button
           type="button"
+          onClick={() => setActiveTab('proposals')}
+          className={`celebrate-details-tab-btn ${activeTab === 'proposals' ? 'celebrate-details-tab-btn--active' : ''}`}
+          id="tab-proposals-btn"
+        >
+          <Sparkles size={16} aria-hidden="true" />
+          <span>AI Revisions & Diffs</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab('overview')}
           className={`celebrate-details-tab-btn ${activeTab === 'overview' ? 'celebrate-details-tab-btn--active' : ''}`}
           id="tab-overview-btn"
@@ -190,15 +231,74 @@ export const EventDetailsView: React.FC<EventDetailsViewProps> = ({
       {/* Tab Panels */}
       <div>
         {activeTab === 'budget' && (
-          <BudgetView eventId={event.id} currency={event.currency} />
+          <BudgetView key={`budget-${event.version}`} eventId={event.id} currency={event.currency} />
         )}
 
         {activeTab === 'timeline' && (
-          <TimelineView eventId={event.id} />
+          <TimelineView key={`timeline-${event.version}`} eventId={event.id} />
         )}
 
         {activeTab === 'vendors' && (
-          <VendorsView eventId={event.id} currency={event.currency} />
+          <VendorsView key={`vendors-${event.version}`} eventId={event.id} currency={event.currency} />
+        )}
+
+        {activeTab === 'proposals' && (
+          <div
+            style={{
+              padding: 'var(--space-6)',
+              backgroundColor: 'var(--surface-card)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-4)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 'var(--font-size-lg)' }}>AI Revisions & Proposals</h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+                  Active Plan Baseline: <strong>v{event.version}</strong>
+                </p>
+              </div>
+
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<Sparkles size={16} />}
+                onClick={() => setIsRequestRevisionOpen(true)}
+                id="tab-request-revision-btn"
+              >
+                Request AI Revision
+              </Button>
+            </div>
+
+            <div
+              style={{
+                padding: 'var(--space-4)',
+                backgroundColor: 'var(--accent-purple-soft)',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-size-xs)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <strong>Proposal Guarantee:</strong> AI proposals are strictly isolated drafts. They do not alter
+              your active budget or tasks until you review the diff and explicitly click Approve.
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+              <Button
+                variant="secondary"
+                size="md"
+                leftIcon={<Layers size={16} />}
+                onClick={() => setIsProposalsListOpen(true)}
+                id="tab-open-proposals-history-btn"
+              >
+                View All Generated Proposals
+              </Button>
+            </div>
+          </div>
         )}
 
         {activeTab === 'overview' && (
@@ -242,6 +342,57 @@ export const EventDetailsView: React.FC<EventDetailsViewProps> = ({
           showToast('Celebration details updated successfully.', 'success');
         }}
       />
+
+      {/* Request AI Revision Modal */}
+      <RequestRevisionModal
+        isOpen={isRequestRevisionOpen}
+        event={event}
+        onClose={() => setIsRequestRevisionOpen(false)}
+        onProposalCreated={(proposal) => {
+          setSelectedProposal(proposal);
+          setIsDiffModalOpen(true);
+          showToast('AI proposal generated! Review the diff before applying.', 'info');
+        }}
+      />
+
+      {/* Proposals List Modal */}
+      <ProposalsListModal
+        isOpen={isProposalsListOpen}
+        event={event}
+        onClose={() => setIsProposalsListOpen(false)}
+        onSelectProposal={(proposal) => {
+          setSelectedProposal(proposal);
+          setIsDiffModalOpen(true);
+        }}
+        onRequestNewRevision={() => {
+          setIsRequestRevisionOpen(true);
+        }}
+      />
+
+      {/* Diff Inspector Modal */}
+      {selectedProposal && (
+        <DiffInspectorModal
+          isOpen={isDiffModalOpen}
+          event={event}
+          proposal={selectedProposal}
+          onClose={() => {
+            setIsDiffModalOpen(false);
+            setSelectedProposal(null);
+          }}
+          onApproved={(updatedEvent) => {
+            onEventUpdated(updatedEvent);
+            showToast(`Proposal approved and applied to v${updatedEvent.version}!`, 'success');
+          }}
+          onRejected={() => {
+            showToast('Proposal rejected. Active event was not modified.', 'info');
+          }}
+          onRequestNewRevision={() => {
+            setIsDiffModalOpen(false);
+            setSelectedProposal(null);
+            setIsRequestRevisionOpen(true);
+          }}
+        />
+      )}
     </div>
   );
 };

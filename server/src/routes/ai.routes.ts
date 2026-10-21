@@ -14,7 +14,7 @@ export const aiRouter = Router({ mergeParams: true });
 // AI Rate Limiter: Prevent LLM quota exhaustion and rapid-fire requests
 const aiRateLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 10, // 10 AI operations per minute per user/IP
+  max: process.env['NODE_ENV'] === 'test' ? 500 : 10, // 10 AI operations per minute in prod, 500 in tests
   message: {
     error: 'RateLimitExceeded',
     message: 'Too many AI requests. Please wait a moment before generating another plan or revision.',
