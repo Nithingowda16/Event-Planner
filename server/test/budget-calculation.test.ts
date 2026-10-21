@@ -343,23 +343,35 @@ describe('Authoritative Deterministic Budget Engine', () => {
       expect(allocations).toEqual([]);
     });
 
-    it('formatCurrency correctly formats USD and other currencies', () => {
+    it('formatCurrency correctly formats Indian Rupees (INR) with en-IN numbering', () => {
+      // Prompt examples: ₹500, ₹12,500, ₹1,25,000
+      expect(formatCurrency(500, 'INR')).toBe('₹500');
+      expect(formatCurrency(12500, 'INR')).toBe('₹12,500');
+      expect(formatCurrency(125000, 'INR')).toBe('₹1,25,000');
+      // Defaults to INR when currency is omitted
+      expect(formatCurrency(125000)).toBe('₹1,25,000');
+      expect(formatCurrency(0)).toBe('₹0');
+    });
+
+    it('formatCurrency supports other currencies if encountered in legacy data', () => {
       expect(formatCurrency(1234.5, 'USD')).toBe('$1,234.50');
       expect(formatCurrency(0, 'USD')).toBe('$0.00');
     });
   });
 
   describe('7. Zod Schema Verification', () => {
-    it('BudgetRebalanceInputSchema accepts valid unique categories', () => {
+    it('BudgetRebalanceInputSchema accepts valid unique categories and defaults to INR', () => {
       const parsed = BudgetRebalanceInputSchema.safeParse({
-        totalBudget: 15000,
-        currency: 'USD',
+        totalBudget: 150000,
         categories: [
           { category: 'Venue', percentage: 50 },
           { category: 'Catering', percentage: 50 },
         ],
       });
       expect(parsed.success).toBe(true);
+      if (parsed.success) {
+        expect(parsed.data.currency).toBe('INR');
+      }
     });
 
     it('BudgetRebalanceInputSchema rejects duplicate categories', () => {

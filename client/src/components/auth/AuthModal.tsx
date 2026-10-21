@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Modal } from '../ui/Modal.js';
 import { Input } from '../ui/Input.js';
 import { Button } from '../ui/Button.js';
@@ -9,12 +9,22 @@ import { useToast } from '../ui/ToastContext.js';
 export interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialMode?: 'login' | 'register';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const { login, register, demoLogin, isLoading, error, clearError } = useAuth();
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'login' }) => {
+  const { login, register, isLoading, error, clearError } = useAuth();
   const { showToast } = useToast();
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  const [showPassword, setShowPassword] = useState(false);
+
+  React.useEffect(() => {
+    if (isOpen && initialMode) {
+      setMode(initialMode);
+      setFormError(null);
+      clearError();
+    }
+  }, [isOpen, initialMode, clearError]);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -42,10 +52,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     try {
       if (mode === 'login') {
         await login({ email, password });
-        showToast('Welcome back to CelebrateOS!', 'success');
+        showToast('Welcome back to Swakarya!', 'success');
       } else {
         await register({ fullName: fullName.trim(), email, password });
-        showToast('Account registered successfully! Welcome to CelebrateOS.', 'success');
+        showToast('Account registered successfully! Welcome to Swakarya.', 'success');
       }
       onClose();
     } catch {
@@ -53,26 +63,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleDemo = async () => {
-    try {
-      await demoLogin();
-      showToast('Logged in as Demo Planner. You can now create and manage real server events.', 'success');
-      onClose();
-    } catch {
-      // Error handled in context
-    }
-  };
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={mode === 'login' ? 'Sign In to CelebrateOS' : 'Create CelebrateOS Account'}
+      title={mode === 'login' ? 'Sign In to Swakarya' : 'Create Swakarya Account'}
       description="Authentication protects your celebrations, budget allocations, and timeline tasks with strict tenant isolation."
       footer={
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
           <button
             type="button"
+            id="auth-toggle-mode-btn"
             onClick={() => {
               setMode(mode === 'login' ? 'register' : 'login');
               setFormError(null);
@@ -95,6 +96,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             variant="primary"
             type="submit"
             form="auth-form"
+            id="auth-submit-btn"
             isLoading={isLoading}
             loadingText={mode === 'login' ? 'Signing in...' : 'Registering...'}
           >
@@ -104,44 +106,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        {/* Quick Demo Access */}
-        <div
-          style={{
-            padding: 'var(--space-3) var(--space-4)',
-            backgroundColor: 'var(--accent-gold-soft)',
-            border: '1px solid var(--accent-gold-border)',
-            borderRadius: 'var(--radius-md)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 'var(--space-3)',
-          }}
-        >
-          <div>
-            <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', fontWeight: 600, color: 'var(--text-primary)' }}>
-              Quick Planner Access
-            </p>
-            <p style={{ margin: 'var(--space-0-5) 0 0 0', fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)' }}>
-              Instant access for evaluation & testing
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<Sparkles size={16} />}
-            onClick={handleDemo}
-            isLoading={isLoading}
-            id="quick-demo-login-btn"
-          >
-            Demo Sign In
-          </Button>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', margin: 'var(--space-1) 0' }}>
-          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--border-subtle)' }} />
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>OR</span>
-          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--border-subtle)' }} />
-        </div>
 
         {(formError || error) && (
           <div
@@ -153,9 +117,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               borderRadius: 'var(--radius-md)',
               color: 'var(--accent-rose)',
               fontSize: 'var(--font-size-sm)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
             }}
           >
-            {formError || error}
+            <AlertCircle size={16} style={{ flexShrink: 0 }} />
+            <span>{formError || error}</span>
           </div>
         )}
 
@@ -167,6 +135,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               placeholder="e.g. Maya Lin"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              leftIcon={<User size={16} />}
               required
             />
           )}
@@ -178,16 +147,39 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             placeholder="planner@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            leftIcon={<Mail size={16} />}
             required
           />
 
           <Input
             id="auth-password-input"
             label="Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            leftIcon={<Lock size={16} />}
+            rightIcon={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                  width: '100%',
+                  height: '100%',
+                }}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            }
             required
             helperText="Minimum 8 characters"
           />

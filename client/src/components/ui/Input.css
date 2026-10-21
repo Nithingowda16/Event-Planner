@@ -73,17 +73,22 @@
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  pointer-events: none;
   width: 36px;
   height: 100%;
 }
 
 .celebrate-input-icon-left {
   left: 0;
+  pointer-events: none;
 }
 
 .celebrate-input-icon-right {
   right: 0;
+}
+
+.celebrate-input-icon-right button {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* Error State */

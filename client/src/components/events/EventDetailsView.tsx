@@ -25,6 +25,7 @@ import { DiffInspectorModal } from '../proposals/DiffInspectorModal.js';
 import { ProposalsListModal } from '../proposals/ProposalsListModal.js';
 import { api, ApiError } from '../../services/api.js';
 import { useToast } from '../ui/ToastContext.js';
+import { formatCurrency } from '../../utils/currency.js';
 import './EventDetailsView.css';
 
 export interface EventDetailsViewProps {
@@ -58,11 +59,7 @@ export const EventDetailsView: React.FC<EventDetailsViewProps> = ({
     year: 'numeric',
   });
 
-  const formattedBudget = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: event.currency,
-    maximumFractionDigits: 0,
-  }).format(event.totalBudget);
+  const formattedBudget = formatCurrency(event.totalBudget, event.currency || 'INR');
 
   const handleDeleteEvent = async () => {
     if (!window.confirm(`Are you sure you want to delete "${event.title}"? All associated budget items, tasks, and vendors will be removed.`)) {

@@ -1,0 +1,434 @@
+/* ==========================================================================
+   Swakarya Collapsible Left Sidebar & Mini-Rail — ChatGPT-Style Aesthetic
+   ========================================================================== */
+
+/* Dark Backdrop Overlay */
+.celebrate-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: var(--z-modal, 1000);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.celebrate-sidebar-backdrop--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Sidebar Shell Container */
+.celebrate-sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: calc(var(--z-modal, 1000) + 1);
+  display: flex;
+  flex-direction: column;
+  background: #0B0B0B;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  overflow: hidden;
+}
+
+[data-theme="light"] .celebrate-sidebar {
+  background: #111113;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Collapsed State: Sleek 60px Rail */
+.celebrate-sidebar--collapsed {
+  width: 60px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Expanded State: 280px Full Drawer */
+.celebrate-sidebar--expanded {
+  width: 280px;
+  box-shadow: 16px 0 45px rgba(0, 0, 0, 0.85);
+}
+
+/* ==========================================================================
+   1. Collapsed Mini-Sidebar Rail Elements (Exact Match to User Reference)
+   ========================================================================== */
+.celebrate-sidebar-rail {
+  width: 60px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0 16px;
+  gap: 14px;
+  cursor: pointer;
+}
+
+.celebrate-sidebar-rail__logo-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: transform 0.2s, background 0.2s;
+  padding: 0;
+  color: #ffffff;
+}
+
+.celebrate-sidebar-rail__logo-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: scale(1.08);
+}
+
+.celebrate-sidebar-rail__logo-btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.celebrate-sidebar-rail__icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #a1a1aa;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  padding: 0;
+}
+
+.celebrate-sidebar-rail__icon-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.celebrate-sidebar-rail__icon-btn--cta {
+  color: #ffffff;
+}
+
+.celebrate-sidebar-rail__icon-btn--cta:hover {
+  color: #D4FF3F;
+  background: rgba(212, 255, 63, 0.12);
+  border-color: rgba(212, 255, 63, 0.35);
+  box-shadow: 0 0 12px rgba(212, 255, 63, 0.2);
+}
+
+.celebrate-sidebar-rail__icon-btn--active {
+  color: #D4FF3F;
+  background: rgba(212, 255, 63, 0.12);
+  border-color: rgba(212, 255, 63, 0.4);
+  box-shadow: 0 0 12px rgba(212, 255, 63, 0.22);
+}
+
+.celebrate-sidebar-rail__active-dot {
+  position: absolute;
+  right: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #D4FF3F;
+  box-shadow: 0 0 6px #D4FF3F;
+}
+
+.celebrate-sidebar-rail__nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.celebrate-sidebar-rail__spacer {
+  flex: 1;
+}
+
+.celebrate-sidebar-rail__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Circular Purple Avatar with "NR" */
+.celebrate-sidebar-rail__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #7C3AED;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.celebrate-sidebar-rail__avatar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 16px rgba(124, 58, 237, 0.7);
+}
+
+/* ==========================================================================
+   2. Expanded Full Sidebar Drawer Elements
+   ========================================================================== */
+.celebrate-sidebar-expanded {
+  width: 280px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: sidebarContentFadeIn 0.2s ease-out;
+}
+
+@keyframes sidebarContentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.celebrate-sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 72px;
+}
+
+.celebrate-sidebar__brand {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.celebrate-sidebar__brand:hover {
+  opacity: 0.9;
+}
+
+.celebrate-sidebar__close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.celebrate-sidebar__close-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-hover);
+  border-color: rgba(255, 45, 171, 0.4);
+  transform: translateX(-2px);
+}
+
+.celebrate-sidebar__close-btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.celebrate-sidebar__cta {
+  padding: var(--space-4) var(--space-4) var(--space-2);
+}
+
+.celebrate-sidebar__create-btn {
+  width: 100% !important;
+  justify-content: center;
+  border-radius: 9999px !important;
+  font-weight: var(--font-weight-bold);
+  padding: 12px 20px !important;
+  box-shadow: 0 4px 18px rgba(212, 255, 63, 0.28) !important;
+}
+
+.celebrate-sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.celebrate-sidebar__section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: var(--font-weight-bold);
+  padding: var(--space-2) var(--space-3) var(--space-1);
+}
+
+.celebrate-sidebar__nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 100%;
+  position: relative;
+}
+
+.celebrate-sidebar__nav-item:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+  border-color: rgba(255, 45, 171, 0.25);
+  transform: translateX(3px);
+}
+
+.celebrate-sidebar__nav-item--active {
+  background: rgba(212, 255, 63, 0.12);
+  color: #D4FF3F;
+  border-color: rgba(212, 255, 63, 0.45);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 0 16px rgba(212, 255, 63, 0.18);
+}
+
+.celebrate-sidebar__nav-icon {
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.celebrate-sidebar__nav-item:hover .celebrate-sidebar__nav-icon {
+  transform: scale(1.1);
+  color: #FF2DAB;
+}
+
+.celebrate-sidebar__nav-item--active .celebrate-sidebar__nav-icon {
+  color: #D4FF3F;
+}
+
+.celebrate-sidebar__nav-label {
+  flex: 1;
+}
+
+.celebrate-sidebar__active-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #D4FF3F;
+  box-shadow: 0 0 8px #D4FF3F;
+}
+
+.celebrate-sidebar__footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: var(--space-4);
+  background: rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.celebrate-sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-surface-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+}
+
+.celebrate-sidebar__user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.celebrate-sidebar__user-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.celebrate-sidebar__user-email {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.celebrate-sidebar__footer-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.celebrate-sidebar__theme-toggle,
+.celebrate-sidebar__logout-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.celebrate-sidebar__theme-toggle:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.celebrate-sidebar__logout-btn:hover {
+  background: rgba(255, 77, 106, 0.12);
+  color: #FF4D6A;
+  border-color: rgba(255, 77, 106, 0.35);
+}
+
+/* Offset Main Content on Desktop Viewports to accommodate the 60px mini-rail */
+@media (min-width: 640px) {
+  .celebrate-app-wrapper {
+    margin-left: 60px;
+    transition: margin-left 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}

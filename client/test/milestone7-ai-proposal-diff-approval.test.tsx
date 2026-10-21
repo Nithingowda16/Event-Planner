@@ -18,7 +18,7 @@ describe('Milestone 7: AI Proposal Diff Preview & Approval UI', () => {
     location: 'Metropolitan Hall, Seattle',
     guestCount: 200,
     totalBudget: 50000,
-    currency: 'USD',
+    currency: 'INR',
     status: 'draft',
     budgetItems: [
       {
@@ -248,9 +248,9 @@ describe('Milestone 7: AI Proposal Diff Preview & Approval UI', () => {
 
       // Verify Budget Tab
       expect(screen.getByText('Live Music & Production')).toBeDefined();
-      expect(screen.getByText('+$2,500')).toBeDefined();
-      expect(screen.getByText('-$2,500')).toBeDefined();
-      expect(screen.getByText('No Change ($0)')).toBeDefined();
+      expect(screen.getByText('+₹2,500')).toBeDefined();
+      expect(screen.getByText('-₹2,500')).toBeDefined();
+      expect(screen.getByText('No Change (₹0)')).toBeDefined();
 
       // Switch to Timeline Tasks Tab
       const tasksTab = screen.getByRole('tab', { name: /Timeline Tasks/i });

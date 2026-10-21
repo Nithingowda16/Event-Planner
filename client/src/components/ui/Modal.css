@@ -2,14 +2,14 @@
   position: fixed;
   inset: 0;
   background-color: var(--bg-backdrop);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: var(--z-modal-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
-  animation: modal-fade-in 0.2s ease-out;
+  animation: modal-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes modal-fade-in {
@@ -23,8 +23,8 @@
 
 .celebrate-modal-container {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-modal);
   box-shadow: var(--shadow-modal);
   width: 100%;
   max-width: 540px;
@@ -33,18 +33,30 @@
   flex-direction: column;
   position: relative;
   z-index: var(--z-modal);
-  animation: modal-scale-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modal-scale-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+}
+
+.celebrate-modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 255, 63, 0.4), rgba(255, 45, 171, 0.4), transparent);
+  pointer-events: none;
+  z-index: 1;
 }
 
 @keyframes modal-scale-up {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96) translateY(8px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 

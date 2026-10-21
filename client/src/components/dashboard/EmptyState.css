@@ -4,41 +4,57 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--space-12) var(--space-6);
-  border: 2px dashed var(--border-medium);
+  padding: var(--space-16) var(--space-6);
+  border: 1px dashed rgba(245, 208, 97, 0.35);
   border-radius: var(--radius-xl);
-  background: var(--bg-glass-card);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: radial-gradient(circle at 50% 25%, rgba(167, 139, 250, 0.08), rgba(15, 18, 26, 0.85) 70%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), inset 0 0 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.celebrate-empty-state::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245, 208, 97, 0.4), rgba(167, 139, 250, 0.4), transparent);
 }
 
 .celebrate-empty-icon {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, var(--accent-gold-soft), var(--accent-purple-soft));
-  border: 1px solid var(--accent-gold-border);
+  background: linear-gradient(135deg, rgba(245, 208, 97, 0.15), rgba(167, 139, 250, 0.15));
+  border: 1px solid rgba(245, 208, 97, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-gold);
   margin-bottom: var(--space-6);
-  box-shadow: var(--shadow-glow-gold);
+  box-shadow: 0 0 30px rgba(245, 208, 97, 0.25), 0 8px 16px rgba(0, 0, 0, 0.4);
+  animation: pulseGlow 4s ease-in-out infinite;
 }
 
 .celebrate-empty-title {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.03em;
   color: var(--text-primary);
   margin-bottom: var(--space-2);
 }
 
 .celebrate-empty-description {
-  max-width: 540px;
+  max-width: 520px;
   color: var(--text-secondary);
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
 .celebrate-empty-features {
@@ -47,5 +63,5 @@
   justify-content: center;
   gap: var(--space-3);
   margin-bottom: var(--space-8);
-  max-width: 600px;
+  max-width: 640px;
 }

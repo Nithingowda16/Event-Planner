@@ -8,6 +8,7 @@ import { Spinner } from '../ui/Spinner.js';
 import { CreateVendorModal } from './CreateVendorModal.js';
 import { api, ApiError } from '../../services/api.js';
 import { useToast } from '../ui/ToastContext.js';
+import { formatCurrency } from '../../utils/currency.js';
 import './VendorsView.css';
 
 export interface VendorsViewProps {
@@ -25,7 +26,7 @@ const statusBadgeConfig: Record<VendorStatus, { label: string; variant: 'blue' |
 
 export const VendorsView: React.FC<VendorsViewProps> = ({ eventId, currency, event }) => {
   const actualEventId = eventId || event?.id || '';
-  const actualCurrency = currency || event?.currency || 'USD';
+  const actualCurrency = currency || event?.currency || 'INR';
   const { showToast } = useToast();
   const [vendors, setVendors] = useState<VendorQuotationEntity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -82,15 +83,7 @@ export const VendorsView: React.FC<VendorsViewProps> = ({ eventId, currency, eve
 
   const formatAmount = (amt?: number | null) => {
     const safeAmt = typeof amt === 'number' && !isNaN(amt) ? amt : 0;
-    try {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency || 'USD',
-        maximumFractionDigits: 2,
-      }).format(safeAmt);
-    } catch {
-      return `${currency || 'USD'} ${safeAmt.toFixed(2)}`;
-    }
+    return formatCurrency(safeAmt, actualCurrency);
   };
 
   const hiredTotal = useMemo(() => {
@@ -148,7 +141,7 @@ export const VendorsView: React.FC<VendorsViewProps> = ({ eventId, currency, eve
         <div className="celebrate-vendor-disclaimer-text">
           <strong>AI Planning Guidance vs. Real Vendors:</strong> Generative AI models provide conceptual service ideas
           (e.g., &quot;Live Acoustic Trio&quot; or &quot;Seasonal Botanical Decor&quot;). To prevent fabricated reviews, fake phone
-          numbers, or phantom businesses, CelebrateOS stores only user-entered estimates and confirmed quotations below.
+          numbers, or phantom businesses, Swakarya stores only user-entered estimates and confirmed quotations below.
         </div>
       </div>
 

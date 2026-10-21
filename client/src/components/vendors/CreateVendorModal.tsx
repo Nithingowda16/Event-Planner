@@ -150,7 +150,7 @@ export const CreateVendorModal: React.FC<CreateVendorModalProps> = ({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-4)' }}>
           <Input
             id="vendor-amount-input"
-            label={`Quoted Amount (${currency})`}
+            label={`Quoted Amount (${currency === 'INR' || !currency ? '₹ INR' : currency})`}
             type="number"
             min="0"
             step="any"

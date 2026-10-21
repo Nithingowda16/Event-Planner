@@ -40,7 +40,7 @@ export const CURRENCY_PRECISION_MAP: Record<string, number> = {
  * Returns the minor unit precision (decimal places) for a given currency code.
  * Defaults to 2 (e.g. cents/paise) if unknown.
  */
-export function getCurrencyPrecision(currency = 'USD'): number {
+export function getCurrencyPrecision(currency = 'INR'): number {
   const normalized = currency.toUpperCase().trim();
   const precision = CURRENCY_PRECISION_MAP[normalized];
   return precision !== undefined ? precision : 2;
@@ -84,7 +84,7 @@ export interface AuthoritativeBudgetOptions {
  */
 export function calculateAuthoritativeBudget({
   totalBudget,
-  currency = 'USD',
+  currency = 'INR',
   categories,
   contingencyCategoryName = 'Contingency & Miscellaneous',
 }: AuthoritativeBudgetOptions): BudgetCalculationResult {
@@ -343,7 +343,7 @@ export function calculateDeterministicAllocations(
 ): CalculatedAllocationResult[] {
   const result = calculateAuthoritativeBudget({
     totalBudget,
-    currency: 'USD',
+    currency: 'INR',
     categories: allocations.map((a) => ({
       category: a.category,
       percentage: a.percentage,
@@ -365,19 +365,50 @@ export function calculateDeterministicAllocations(
   }));
 }
 
+export interface FormatCurrencyOptions {
+  maximumFractionDigits?: number;
+  minimumFractionDigits?: number;
+  forceDecimals?: boolean;
+}
+
 /**
  * Formats a currency amount according to localized currency standards.
+ * Defaults to Indian Rupees (₹, INR) with en-IN numbering (e.g. ₹500, ₹12,500, ₹1,25,000).
  */
-export function formatCurrency(amount: number, currency = 'USD'): string {
+export function formatCurrency(
+  amount: number,
+  currency = 'INR',
+  options?: FormatCurrencyOptions
+): string {
+  const normalized = (currency || 'INR').toUpperCase().trim();
+  const isINR = normalized === 'INR';
+  const locale = isINR ? 'en-IN' : 'en-US';
+
+  let maxDecimals: number;
+  let minDecimals: number;
+
+  if (isINR) {
+    const hasFractions = amount % 1 !== 0;
+    maxDecimals = options?.maximumFractionDigits !== undefined
+      ? options.maximumFractionDigits
+      : (options?.forceDecimals || hasFractions ? 2 : 0);
+    minDecimals = options?.minimumFractionDigits !== undefined
+      ? options.minimumFractionDigits
+      : (options?.forceDecimals || hasFractions ? maxDecimals : 0);
+  } else {
+    maxDecimals = options?.maximumFractionDigits !== undefined ? options.maximumFractionDigits : 2;
+    minDecimals = options?.minimumFractionDigits !== undefined ? options.minimumFractionDigits : 2;
+  }
+
   try {
-    const precision = getCurrencyPrecision(currency);
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency,
-      minimumFractionDigits: precision,
-      maximumFractionDigits: precision,
+      currency: normalized,
+      minimumFractionDigits: minDecimals,
+      maximumFractionDigits: maxDecimals,
     }).format(amount);
   } catch {
-    return `${currency} ${amount.toFixed(2)}`;
+    const symbol = isINR ? '₹' : `${normalized} `;
+    return `${symbol}${amount.toLocaleString(locale)}`;
   }
 }

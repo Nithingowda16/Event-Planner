@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  animation: fadeIn 0.25s ease-out;
 }
 
 .celebrate-vendor-disclaimer {
@@ -9,10 +10,11 @@
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-4) var(--space-5);
-  background-color: var(--accent-purple-soft);
+  background: radial-gradient(circle at 10% 50%, rgba(167, 139, 250, 0.15), rgba(22, 27, 38, 0.6) 80%);
   border: 1px solid rgba(167, 139, 250, 0.35);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   color: var(--text-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(167, 139, 250, 0.05);
 }
 
 .celebrate-vendor-disclaimer-icon {
@@ -37,10 +39,22 @@
 }
 
 .celebrate-vendor-card-item {
-  padding: var(--space-4);
+  padding: var(--space-5) var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.celebrate-vendor-card-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-highlight);
 }
 
 .celebrate-vendor-table {
@@ -51,22 +65,24 @@
 }
 
 .celebrate-vendor-table th {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--border-medium);
+  background-color: rgba(0, 0, 0, 0.2);
   color: var(--text-secondary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-xs);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .celebrate-vendor-table td {
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-primary);
   vertical-align: middle;
+  transition: background-color var(--transition-fast);
 }
 
-.celebrate-vendor-table tr:hover {
-  background-color: rgba(255, 255, 255, 0.02);
+.celebrate-vendor-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.03);
 }

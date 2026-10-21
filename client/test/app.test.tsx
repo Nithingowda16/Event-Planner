@@ -134,7 +134,7 @@ describe('CelebrateOS Application Shell & Dashboard (Milestone 5 & 6)', () => {
       expect(footer).toBeDefined();
 
       // Branding
-      expect(screen.getByRole('heading', { level: 1, name: /celebrateos/i })).toBeDefined();
+      expect(screen.getByRole('heading', { level: 1, name: /swakarya/i })).toBeDefined();
 
       // Backend status resolution
       await waitFor(() => {

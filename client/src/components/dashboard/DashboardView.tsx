@@ -8,6 +8,7 @@ import { Select } from '../ui/Select.js';
 import { Button } from '../ui/Button.js';
 import { Spinner } from '../ui/Spinner.js';
 import type { EventEntity } from '@celebrateos/shared';
+import { formatINR } from '../../utils/currency.js';
 import './DashboardView.css';
 
 export interface DashboardViewProps {
@@ -41,14 +42,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     });
   }, [events, searchQuery, filterType]);
 
-  // Aggregate metrics
-  const totalBudgetUSD = useMemo(() => {
-    const sum = events.reduce((acc, ev) => acc + (ev.currency === 'USD' ? ev.totalBudget : 0), 0);
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0,
-    }).format(sum);
+  // Aggregate metrics in Indian Rupees (₹, INR)
+  const totalBudgetFormatted = useMemo(() => {
+    const sum = events.reduce((acc, ev) => acc + (ev.totalBudget || 0), 0);
+    return formatINR(sum);
   }, [events]);
 
   const filterOptions = [
@@ -87,7 +84,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Metrics Overview */}
       <DashboardOverview
         totalEvents={events.length}
-        totalBudgetFormatted={totalBudgetUSD}
+        totalBudgetFormatted={totalBudgetFormatted}
         activeProposalsCount={0}
         completedTasksCount={0}
       />

@@ -64,7 +64,7 @@ export const RequestRevisionModal: React.FC<RequestRevisionModalProps> = ({
         } else if (err.status === 502) {
           setError(
             err.message ||
-              'Gemini AI response could not be validated against CelebrateOS schema. Please try refining your prompt.'
+              'Gemini AI response could not be validated against Swakarya schema. Please try refining your prompt.'
           );
         } else if (err.status === 409) {
           setError(

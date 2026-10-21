@@ -7,7 +7,7 @@ import {
   TrendingUp,
   TrendingDown,
   Lightbulb,
-  DollarSign,
+  Wallet,
   Calendar,
   Layers,
 } from 'lucide-react';
@@ -16,6 +16,7 @@ import { Modal } from '../ui/Modal.js';
 import { Button } from '../ui/Button.js';
 import { Badge } from '../ui/Badge.js';
 import { api, ApiError } from '../../services/api.js';
+import { formatCurrency as formatCurrencyUtil } from '../../utils/currency.js';
 import './DiffInspectorModal.css';
 
 export interface DiffInspectorModalProps {
@@ -62,11 +63,7 @@ export const DiffInspectorModal: React.FC<DiffInspectorModalProps> = ({
   const netBudgetDelta = budgetDeltas.reduce((acc, curr) => acc + curr.deltaAmount, 0);
 
   const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: event.currency || 'USD',
-      maximumFractionDigits: 0,
-    }).format(val);
+    return formatCurrencyUtil(val, event.currency || 'INR');
   };
 
   const handleApprove = async () => {
@@ -270,7 +267,7 @@ export const DiffInspectorModal: React.FC<DiffInspectorModalProps> = ({
 
           <div className="diff-metric-card">
             <div className={`diff-metric-value ${netBudgetDelta === 0 ? 'neutral' : netBudgetDelta > 0 ? 'positive' : 'negative'}`}>
-              {netBudgetDelta === 0 ? '$0' : formatCurrency(netBudgetDelta)}
+              {netBudgetDelta === 0 ? '₹0' : formatCurrency(netBudgetDelta)}
             </div>
             <div className="diff-metric-label">Net Budget Delta</div>
           </div>
@@ -298,7 +295,7 @@ export const DiffInspectorModal: React.FC<DiffInspectorModalProps> = ({
             onClick={() => setActiveTab('budget')}
             id="diff-tab-budget"
           >
-            <DollarSign size={16} />
+            <Wallet size={16} />
             Budget Changes ({budgetDeltas.length})
           </button>
           <button
@@ -367,7 +364,7 @@ export const DiffInspectorModal: React.FC<DiffInspectorModalProps> = ({
                           )}
                           {!isIncreased && !isDecreased && (
                             <span className="diff-delta-badge unchanged">
-                              No Change ($0)
+                              No Change (₹0)
                             </span>
                           )}
                         </td>

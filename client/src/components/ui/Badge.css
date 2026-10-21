@@ -23,9 +23,9 @@
 
 /* Variant Styles - WCAG 2.1 AA high contrast */
 .celebrate-badge--gold {
-  background-color: var(--accent-gold-soft);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  background-color: rgba(212, 255, 63, 0.12);
+  color: #D4FF3F;
+  border: 1px solid rgba(212, 255, 63, 0.5);
 }
 
 .celebrate-badge--emerald {
@@ -35,15 +35,15 @@
 }
 
 .celebrate-badge--purple {
-  background-color: var(--accent-purple-soft);
-  color: #c4b5fd;
-  border: 1px solid rgba(167, 139, 250, 0.35);
+  background-color: rgba(255, 45, 171, 0.12);
+  color: #FF2DAB;
+  border: 1px solid rgba(255, 45, 171, 0.5);
 }
 
 .celebrate-badge--rose {
-  background-color: var(--accent-rose-soft);
-  color: #fda4af;
-  border: 1px solid rgba(251, 113, 133, 0.35);
+  background-color: rgba(255, 45, 171, 0.12);
+  color: #FF2DAB;
+  border: 1px solid rgba(255, 45, 171, 0.5);
 }
 
 .celebrate-badge--blue {

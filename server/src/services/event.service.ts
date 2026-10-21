@@ -62,7 +62,7 @@ export async function createEvent(userId: string, input: CreateEventInput): Prom
   // Calculate authoritative starter budget
   const budgetResult = calculateAuthoritativeBudget({
     totalBudget: input.totalBudget,
-    currency: input.currency || 'USD',
+    currency: input.currency || 'INR',
     categories: DEFAULT_BUDGET_TEMPLATE,
   });
 
@@ -86,7 +86,7 @@ export async function createEvent(userId: string, input: CreateEventInput): Prom
     location: input.location.trim(),
     guestCount: input.guestCount,
     totalBudget: input.totalBudget,
-    currency: input.currency || 'USD',
+    currency: input.currency || 'INR',
     preferences: input.preferences || {},
     status: 'draft',
     budgetItems,

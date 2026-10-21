@@ -20,7 +20,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onCreateEvent }) => {
       </h2>
 
       <p className="celebrate-empty-description">
-        Welcome to <strong>CelebrateOS</strong>. Your journey starts by defining an event.
+        Welcome to <strong>Swakarya</strong>. Your journey starts by defining an event.
         Our Gemini 2.5 Flash AI integration creates comprehensive timeline milestones,
         conceptual vendor ideas, and deterministic multi-currency budget allocations with zero floating-point drift.
       </p>

@@ -35,7 +35,7 @@ export const CreateEventInputSchema = z.object({
   location: z.string().min(2, 'Location is required').max(200).trim(),
   guestCount: z.number().int().positive('Guest count must be at least 1').max(50000),
   totalBudget: z.number().positive('Budget must be greater than zero').max(100000000),
-  currency: z.string().min(1).max(10).default('USD'),
+  currency: z.string().min(1).max(10).default('INR'),
   preferences: EventPreferencesSchema.default({}),
 });
 
@@ -63,7 +63,7 @@ export const BudgetItemAllocationInputSchema = z.object({
 
 export const BudgetRebalanceInputSchema = z.object({
   totalBudget: z.number().positive('Total budget must be a positive number greater than zero').max(100000000),
-  currency: z.string().min(1).max(10).default('USD'),
+  currency: z.string().min(1).max(10).default('INR'),
   contingencyCategoryName: z.string().max(100).default('Contingency & Miscellaneous'),
   categories: z.array(BudgetItemAllocationInputSchema).min(1, 'At least one budget category is required'),
 }).refine(

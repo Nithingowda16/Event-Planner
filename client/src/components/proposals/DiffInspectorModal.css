@@ -1,4 +1,4 @@
-/* Diff Inspector Modal Styles */
+/* Diff Inspector Modal Styles — Cinematic Luxury Review */
 
 .diff-inspector-container {
   display: flex;
@@ -12,16 +12,17 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--accent-amber-soft);
-  border: 1px solid rgba(251, 191, 36, 0.4);
-  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background-color: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: var(--radius-lg);
   color: var(--text-primary);
   font-size: var(--font-size-sm);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .diff-stale-banner strong {
-  color: var(--accent-amber);
+  color: #f5d061;
 }
 
 /* Status & Version Header */
@@ -31,10 +32,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
-  padding: var(--space-3);
-  background-color: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
 }
 
 .diff-version-info {
@@ -46,20 +47,21 @@
 }
 
 .diff-version-pill {
-  padding: 2px 8px;
-  background-color: var(--surface-base);
-  border: 1px solid var(--border-subtle);
+  padding: 2px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-medium);
   border-radius: var(--radius-full);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
 }
 
 /* Summary Card */
 .diff-summary-card {
-  padding: var(--space-4);
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  background: radial-gradient(circle at 10% 20%, rgba(167, 139, 250, 0.12), rgba(22, 27, 38, 0.7) 80%);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .diff-summary-prompt {
@@ -69,8 +71,9 @@
 }
 
 .diff-summary-prompt span {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-style: italic;
+  font-weight: var(--font-weight-medium);
 }
 
 .diff-summary-text {
@@ -88,18 +91,24 @@
 }
 
 .diff-metric-card {
-  padding: var(--space-3);
-  background-color: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
   text-align: center;
+  transition: transform var(--transition-fast);
+}
+
+.diff-metric-card:hover {
+  transform: translateY(-1px);
 }
 
 .diff-metric-value {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
   font-family: var(--font-display);
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .diff-metric-value.positive {
@@ -118,6 +127,9 @@
   font-size: var(--font-size-xs);
   color: var(--text-muted);
   margin-top: var(--space-1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-medium);
 }
 
 /* Tab Navigation */
@@ -126,12 +138,13 @@
   gap: var(--space-2);
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: var(--space-2);
+  overflow-x: auto;
 }
 
 .diff-tab-btn {
   padding: var(--space-2) var(--space-3);
-  background: none;
-  border: none;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
@@ -141,16 +154,19 @@
   align-items: center;
   gap: var(--space-2);
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
 .diff-tab-btn:hover {
   color: var(--text-primary);
-  background-color: var(--surface-card);
+  background-color: var(--bg-surface-hover);
 }
 
 .diff-tab-btn.active {
-  color: var(--accent-purple);
-  background-color: var(--accent-purple-soft);
+  color: var(--accent-gold);
+  background: rgba(245, 208, 97, 0.12);
+  border-color: rgba(245, 208, 97, 0.3);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* Budget Diff Table */
@@ -159,14 +175,22 @@
   border-collapse: separate;
   border-spacing: 0;
   font-size: var(--font-size-xs);
+  background: var(--bg-surface-elevated);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
 }
 
 .diff-budget-table th {
   text-align: left;
   padding: var(--space-2) var(--space-3);
   color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid var(--border-subtle);
   font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
 }
 
 .diff-budget-table td {
@@ -179,29 +203,37 @@
   border-bottom: none;
 }
 
+.diff-budget-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
 .diff-delta-badge {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px 6px;
+  gap: 3px;
+  padding: 3px 8px;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.02em;
 }
 
 .diff-delta-badge.increased {
-  background-color: var(--accent-emerald-soft);
+  background: rgba(52, 211, 153, 0.12);
   color: var(--accent-emerald);
+  border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .diff-delta-badge.decreased {
-  background-color: var(--accent-rose-soft);
+  background: rgba(251, 113, 133, 0.12);
   color: var(--accent-rose);
+  border: 1px solid rgba(251, 113, 133, 0.3);
 }
 
 .diff-delta-badge.unchanged {
-  background-color: var(--surface-card);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
 }
 
 /* Tasks Diff List */
@@ -211,6 +243,7 @@
   gap: var(--space-2);
   max-height: 320px;
   overflow-y: auto;
+  padding-right: var(--space-1);
 }
 
 .diff-task-item {
@@ -219,24 +252,40 @@
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-3);
-  background-color: var(--surface-card);
+  background-color: var(--bg-surface-elevated);
   border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
   border-left: 3px solid transparent;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.diff-task-item:hover {
+  background-color: var(--bg-surface-hover);
+  transform: translateX(2px);
 }
 
 .diff-task-item.added {
   border-left-color: var(--accent-emerald);
-  background-color: rgba(16, 185, 129, 0.05);
+  background-color: rgba(52, 211, 153, 0.06);
+  border-top-color: rgba(52, 211, 153, 0.2);
+  border-right-color: rgba(52, 211, 153, 0.2);
+  border-bottom-color: rgba(52, 211, 153, 0.2);
 }
 
 .diff-task-item.removed {
   border-left-color: var(--accent-rose);
-  background-color: rgba(244, 63, 94, 0.05);
+  background-color: rgba(251, 113, 133, 0.06);
+  border-top-color: rgba(251, 113, 133, 0.2);
+  border-right-color: rgba(251, 113, 133, 0.2);
+  border-bottom-color: rgba(251, 113, 133, 0.2);
 }
 
 .diff-task-item.modified {
-  border-left-color: var(--accent-amber);
-  background-color: rgba(245, 158, 11, 0.05);
+  border-left-color: var(--accent-gold);
+  background-color: rgba(245, 208, 97, 0.06);
+  border-top-color: rgba(245, 208, 97, 0.2);
+  border-right-color: rgba(245, 208, 97, 0.2);
+  border-bottom-color: rgba(245, 208, 97, 0.2);
 }
 
 .diff-task-title {
@@ -249,6 +298,7 @@
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
   margin-top: 2px;
+  line-height: 1.4;
 }
 
 /* Vendor Suggestions */
@@ -263,11 +313,16 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background-color: var(--surface-card);
+  background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast);
+}
+
+.diff-vendor-idea-item:hover {
+  border-color: var(--border-medium);
 }
 
 /* Consequence Notice in Footer */

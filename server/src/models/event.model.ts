@@ -94,7 +94,7 @@ const EventSchema = new Schema<IEvent>(
     },
     currency: {
       type: String,
-      default: 'USD',
+      default: 'INR',
       uppercase: true,
       trim: true,
       maxlength: 10,

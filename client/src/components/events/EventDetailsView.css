@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: var(--space-6);
   padding: var(--space-6) 0 var(--space-12) 0;
+  animation: fadeIn 0.25s ease-out;
 }
 
 .celebrate-details-header {
@@ -10,11 +11,26 @@
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: var(--space-4);
-  padding: var(--space-6);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  border-radius: var(--radius-xl);
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.celebrate-details-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245, 208, 97, 0.35), rgba(167, 139, 250, 0.35), transparent);
 }
 
 .celebrate-details-tabs {
@@ -24,13 +40,18 @@
   border-bottom: 1px solid var(--border-medium);
   padding-bottom: 0;
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.celebrate-details-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .celebrate-details-tab-btn {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-5);
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -39,20 +60,22 @@
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   border-bottom: 2px solid transparent;
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
 .celebrate-details-tab-btn:hover {
   color: var(--text-primary);
-  background-color: var(--bg-surface-elevated);
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 .celebrate-details-tab-btn--active {
   color: var(--accent-gold);
   border-bottom-color: var(--accent-gold);
   font-weight: var(--font-weight-bold);
-  background-color: var(--accent-gold-soft);
+  background-color: rgba(245, 208, 97, 0.08);
 }
 
 .celebrate-details-tab-btn:focus-visible {

@@ -30,8 +30,8 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   });
   const [location, setLocation] = useState('');
   const [guestCount, setGuestCount] = useState('100');
-  const [totalBudget, setTotalBudget] = useState('15000');
-  const [currency, setCurrency] = useState<string>('USD');
+  const [totalBudget, setTotalBudget] = useState('500000');
+  const [currency, setCurrency] = useState<string>('INR');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -116,7 +116,6 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   ];
 
   const currencyOptions = [
-    { value: 'USD', label: 'USD ($) - US Dollar' },
     { value: 'INR', label: 'INR (₹) - Indian Rupee' },
     { value: 'EUR', label: 'EUR (€) - Euro' },
     { value: 'GBP', label: 'GBP (£) - British Pound' },
@@ -245,7 +244,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 
         <Input
           id="event-budget-input"
-          label="Total Budget"
+          label={currency === 'INR' ? 'Total Budget (₹ INR)' : `Total Budget (${currency})`}
           type="number"
           min="1"
           step="any"
@@ -254,7 +253,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
           required
           disabled={isSubmitting}
           error={errors.totalBudget}
-          helperText="Authoritative server calculations guarantee exact total invariant"
+          helperText="Authoritative server calculations guarantee exact total invariant (e.g. ₹5,00,000)"
         />
       </form>
     </Modal>

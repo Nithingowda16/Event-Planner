@@ -18,37 +18,70 @@ body {
 }
 
 body {
-  background-color: var(--bg-primary);
+  background-color: #0B0B0B !important;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 45, 171, 0.12), transparent 70%),
+    radial-gradient(circle 600px at 90% 10%, rgba(212, 255, 63, 0.08), transparent 60%),
+    radial-gradient(circle 500px at 10% 40%, rgba(255, 45, 171, 0.06), transparent 50%);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+[data-theme="light"] body {
+  background-color: #0B0B0B !important;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 45, 171, 0.10), transparent 70%),
+    radial-gradient(circle 600px at 90% 10%, rgba(212, 255, 63, 0.06), transparent 60%);
+}
+
+::selection {
+  background-color: #FF2DAB;
+  color: #0B0B0B;
 }
 
 #root {
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: #0B0B0B;
 }
 
 /* ==========================================================================
-   Typography Standards
+   Typography Standards — Hot Pink #FF2DAB & Chartreuse #D4FF3F
    ========================================================================== */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
   line-height: var(--line-height-tight);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
-h1 { font-size: var(--font-size-3xl); }
-h2 { font-size: var(--font-size-2xl); }
-h3 { font-size: var(--font-size-xl); }
-h4 { font-size: var(--font-size-lg); }
+h1 { 
+  font-size: var(--font-size-3xl); 
+  color: #ffffff;
+}
+
+h2 { 
+  font-size: var(--font-size-2xl); 
+  color: var(--color-hot-pink);
+}
+
+h3 { 
+  font-size: var(--font-size-xl); 
+  color: var(--color-chartreuse);
+}
+
+h4 { 
+  font-size: var(--font-size-lg); 
+  color: var(--color-hot-pink);
+}
 
 p {
   color: var(--text-secondary);
@@ -56,13 +89,13 @@ p {
 }
 
 a {
-  color: var(--accent-gold);
+  color: var(--color-chartreuse);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--accent-gold-hover);
+  color: var(--color-hot-pink);
 }
 
 button,
@@ -171,3 +204,50 @@ textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-highlight);
 }
+
+/* ==========================================================================
+   Motion & Animation System (Expressive, Performance-Optimized)
+   ========================================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.96);
+  }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-smooth) ease-out forwards;
+}
+
+.slide-up {
+  animation: fadeInUp var(--transition-smooth) ease-out forwards;
+}
+
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }

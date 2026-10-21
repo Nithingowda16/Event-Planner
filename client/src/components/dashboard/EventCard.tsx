@@ -5,6 +5,7 @@ import { Badge } from '../ui/Badge.js';
 import { Button } from '../ui/Button.js';
 import type { EventEntity } from '@celebrateos/shared';
 import type { BadgeVariant } from '../../types/index.js';
+import { formatCurrency } from '../../utils/currency.js';
 import './EventCard.css';
 
 export interface EventCardProps {
@@ -29,17 +30,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onSelect }) => {
     variant: 'neutral' as BadgeVariant,
   };
 
-  const formattedDate = new Date(event.eventDate).toLocaleDateString('en-US', {
+  const formattedDate = new Date(event.eventDate).toLocaleDateString('en-IN', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
 
-  const formattedBudget = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: event.currency,
-    maximumFractionDigits: 0,
-  }).format(event.totalBudget);
+  const formattedBudget = formatCurrency(event.totalBudget, event.currency || 'INR');
 
   return (
     <Card elevation="elevated" interactive className="celebrate-event-card">

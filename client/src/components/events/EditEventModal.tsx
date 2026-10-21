@@ -154,7 +154,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
           <Input
             id="edit-budget-input"
-            label={`Total Budget (${event.currency})`}
+            label={`Total Budget (${event.currency === 'INR' || !event.currency ? '₹ INR' : event.currency})`}
             type="number"
             min="1"
             step="any"

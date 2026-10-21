@@ -1,7 +1,8 @@
 .celebrate-timeline-view {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-8);
+  animation: fadeIn 0.25s ease-out;
 }
 
 .celebrate-phase-section {
@@ -14,11 +15,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--border-medium);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-medium);
+  position: relative;
+}
+
+.celebrate-phase-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-purple));
+  border-radius: var(--radius-full);
 }
 
 .celebrate-phase-title {
+  font-family: var(--font-display);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
@@ -26,6 +40,7 @@
   align-items: center;
   gap: var(--space-2);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .celebrate-task-list {
@@ -38,21 +53,27 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-4);
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
-  background-color: var(--bg-surface-elevated);
-  border: 1px solid var(--border-subtle);
-  transition: all var(--transition-fast);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-medium);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .celebrate-task-item:hover {
-  border-color: var(--border-highlight);
+  border-color: rgba(167, 139, 250, 0.35);
   background-color: var(--bg-surface-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 .celebrate-task-item--completed {
   opacity: 0.65;
-  background-color: rgba(17, 24, 39, 0.4);
+  background-color: rgba(15, 18, 26, 0.5);
+  border-color: rgba(52, 211, 153, 0.2);
 }
 
 .celebrate-task-checkbox {

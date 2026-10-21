@@ -8,6 +8,7 @@ import { Spinner } from '../ui/Spinner.js';
 import { EditBudgetItemModal } from './EditBudgetItemModal.js';
 import { api, ApiError } from '../../services/api.js';
 import { useToast } from '../ui/ToastContext.js';
+import { formatCurrency } from '../../utils/currency.js';
 import './BudgetView.css';
 
 export interface BudgetViewProps {
@@ -18,7 +19,7 @@ export interface BudgetViewProps {
 
 export const BudgetView: React.FC<BudgetViewProps> = ({ eventId, currency, event }) => {
   const actualEventId = eventId || event?.id || '';
-  const actualCurrency = currency || event?.currency || 'USD';
+  const actualCurrency = currency || event?.currency || 'INR';
   const { showToast } = useToast();
   const [budget, setBudget] = useState<BudgetSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -70,15 +71,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({ eventId, currency, event
 
   const formatAmount = (amt?: number | null) => {
     const safeAmt = typeof amt === 'number' && !isNaN(amt) ? amt : 0;
-    try {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: actualCurrency,
-        maximumFractionDigits: 2,
-      }).format(safeAmt);
-    } catch {
-      return `${actualCurrency} ${safeAmt.toFixed(2)}`;
-    }
+    return formatCurrency(safeAmt, actualCurrency);
   };
 
   if (isLoading) {
@@ -146,7 +139,7 @@ export const BudgetView: React.FC<BudgetViewProps> = ({ eventId, currency, event
         <Card elevation="elevated" className="celebrate-budget-card">
           <span className="celebrate-budget-card-label">Total Event Budget</span>
           <span className="celebrate-budget-card-amount">{formatAmount(budget.totalBudget)}</span>
-          <span className="celebrate-budget-card-subtext">Currency: {currency}</span>
+          <span className="celebrate-budget-card-subtext">Currency: {actualCurrency}</span>
         </Card>
 
         <Card elevation="elevated" className="celebrate-budget-card">

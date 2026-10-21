@@ -1,0 +1,80 @@
+/* ==========================================================================
+   Swakarya — Theme-Aware Lotus Logo & Brand Wordmark
+   ========================================================================== */
+
+.swakarya-brand-container {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.swakarya-logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.swakarya-brand-container:hover .swakarya-logo-wrapper {
+  transform: scale(1.04);
+}
+
+.swakarya-lotus-img {
+  display: block;
+  object-fit: contain;
+  transition: opacity var(--transition-fast), filter var(--transition-fast);
+}
+
+.swakarya-brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.swakarya-wordmark {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  transition: color var(--transition-smooth);
+}
+
+/* Radiant Hot Pink #FF2DAB & Chartreuse #D4FF3F Brand Gradient */
+.swakarya-wordmark {
+  background: linear-gradient(135deg, #ffffff 20%, #D4FF3F 65%, #FF2DAB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .swakarya-wordmark,
+[data-theme="light"] .swakarya-wordmark {
+  background: linear-gradient(135deg, #ffffff 20%, #D4FF3F 65%, #FF2DAB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.swakarya-tagline {
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: #D4FF3F;
+  line-height: 1.3;
+  margin-top: 1px;
+  letter-spacing: -0.01em;
+  transition: color var(--transition-smooth);
+}
+
+/* Compact variant for tight headers */
+.swakarya-brand-container--compact .swakarya-wordmark {
+  font-size: var(--font-size-lg);
+}
+
+.swakarya-brand-container--compact .swakarya-tagline {
+  font-size: 0.7rem;
+}

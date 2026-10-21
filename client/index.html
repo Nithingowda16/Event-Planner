@@ -2,10 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>" />
+    <link rel="icon" type="image/png" href="/swakarya-favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="CelebrateOS — AI-Powered Celebration & Event Planner for weddings, birthdays, and community events." />
-    <title>CelebrateOS — AI-Powered Celebration & Event Planner</title>
+    <meta name="description" content="Swakarya — Every Moment, Beautifully Planned. Professional event planning workspace with budgets, timelines, tasks, vendor quotes, and AI proposals." />
+    <title>Swakarya — Every Moment, Beautifully Planned.</title>
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('swakarya_theme');
+          var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = saved === 'light' ? 'light' : (saved === 'dark' ? 'dark' : (systemDark ? 'dark' : 'dark'));
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">

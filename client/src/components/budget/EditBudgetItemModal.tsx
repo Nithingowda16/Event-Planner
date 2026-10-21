@@ -118,7 +118,7 @@ export const EditBudgetItemModal: React.FC<EditBudgetItemModalProps> = ({
 
         <Input
           id="budget-item-amount"
-          label={`Allocated Amount (${currency})`}
+          label={`Allocated Amount (${currency === 'INR' || !currency ? '₹ INR' : currency})`}
           type="number"
           min="0"
           step="any"
@@ -130,7 +130,7 @@ export const EditBudgetItemModal: React.FC<EditBudgetItemModalProps> = ({
 
         <Input
           id="budget-item-spent"
-          label={`Actual Spent to Date (${currency})`}
+          label={`Actual Spent to Date (${currency === 'INR' || !currency ? '₹ INR' : currency})`}
           type="number"
           min="0"
           step="any"

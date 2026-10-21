@@ -10,7 +10,6 @@ export interface AuthContextValue {
   error: string | null;
   login: (credentials: LoginInput) => Promise<void>;
   register: (data: RegisterInput) => Promise<void>;
-  demoLogin: () => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -94,37 +93,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Demo Login: automatically registers or logs in as a demo planner
-  const demoLogin = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    const demoEmail = 'planner@celebrateos.dev';
-    const demoPassword = 'Password123!';
-
-    try {
-      const result = await api.auth.login({ email: demoEmail, password: demoPassword });
-      setUser(result.user);
-      setToken(result.token);
-    } catch {
-      // If user doesn't exist yet, register demo account
-      try {
-        const result = await api.auth.register({
-          email: demoEmail,
-          password: demoPassword,
-          fullName: 'CelebrateOS Demo Planner',
-        });
-        setUser(result.user);
-        setToken(result.token);
-      } catch (err) {
-        const msg = err instanceof ApiError ? err.message : 'Demo login failed';
-        setError(msg);
-        throw err;
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -148,7 +116,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error,
         login,
         register,
-        demoLogin,
         logout,
         clearError,
       }}
