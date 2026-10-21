@@ -1,18 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import type { EventEntity } from '@celebrateos/shared';
 import { Header } from './components/layout/Header.js';
 import { Footer } from './components/layout/Footer.js';
 import { DashboardView } from './components/dashboard/DashboardView.js';
+import { EventDetailsView } from './components/events/EventDetailsView.js';
 import { CreateEventModal } from './components/dashboard/CreateEventModal.js';
+import { AuthModal } from './components/auth/AuthModal.js';
 import { ToastProvider, useToast } from './components/ui/ToastContext.js';
-import type { DashboardEventItem } from './types/index.js';
+import { AuthProvider, useAuth } from './context/AuthContext.js';
+import { api, ApiError } from './services/api.js';
 import './styles/global.css';
 
 const AppContent: React.FC = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const { showToast } = useToast();
-  const [events, setEvents] = useState<DashboardEventItem[]>([]);
-  const [isLoading] = useState<boolean>(false);
-  const [error] = useState<string | null>(null);
+
+  const [events, setEvents] = useState<EventEntity[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<EventEntity | null>(null);
+  const [isLoadingEvents, setIsLoadingEvents] = useState<boolean>(false);
+  const [eventsError, setEventsError] = useState<string | null>(null);
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [backendStatus, setBackendStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
 
@@ -35,20 +44,56 @@ const AppContent: React.FC = () => {
     checkHealth();
   }, [checkHealth]);
 
-  const handleCreateEvent = (newEventData: Omit<DashboardEventItem, 'id' | 'version'>) => {
-    const newEvent: DashboardEventItem = {
-      ...newEventData,
-      id: `evt-${Date.now()}`,
-      version: 0,
-      createdAt: new Date().toISOString(),
-    };
+  // Fetch real authenticated events from server
+  const loadEvents = useCallback(async () => {
+    if (!isAuthenticated) {
+      setEvents([]);
+      return;
+    }
 
+    setIsLoadingEvents(true);
+    setEventsError(null);
+    try {
+      const res = await api.events.list({ limit: 50 });
+      setEvents(res.data);
+    } catch (err: unknown) {
+      const msg = err instanceof ApiError ? err.message : 'Failed to retrieve your celebrations';
+      setEventsError(msg);
+    } finally {
+      setIsLoadingEvents(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
+
+  const handleEventCreated = (newEvent: EventEntity) => {
     setEvents((prev) => [newEvent, ...prev]);
-    showToast(`"${newEvent.title}" added to local preview. Full server persistence will connect in Milestone 6.`, 'success');
+    showToast(`"${newEvent.title}" successfully created and saved to server.`, 'success');
   };
 
-  const handleSelectEvent = (event: DashboardEventItem) => {
-    showToast(`Selected "${event.title}". Event details and AI proposals will open in Milestone 6 & 7.`, 'info');
+  const handleEventUpdated = (updatedEvent: EventEntity) => {
+    setEvents((prev) => prev.map((ev) => (ev.id === updatedEvent.id ? updatedEvent : ev)));
+    if (selectedEvent?.id === updatedEvent.id) {
+      setSelectedEvent(updatedEvent);
+    }
+  };
+
+  const handleEventDeleted = (eventId: string) => {
+    setEvents((prev) => prev.filter((ev) => ev.id !== eventId));
+    if (selectedEvent?.id === eventId) {
+      setSelectedEvent(null);
+    }
+  };
+
+  const handleCreateEventClick = () => {
+    if (!isAuthenticated) {
+      showToast('Please sign in or use Demo Planner access to create a celebration.', 'info');
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setIsCreateModalOpen(true);
   };
 
   return (
@@ -60,24 +105,41 @@ const AppContent: React.FC = () => {
 
       {/* Header Landmark */}
       <Header
-        onCreateEvent={() => setIsCreateModalOpen(true)}
+        onCreateEvent={handleCreateEventClick}
         backendStatus={backendStatus}
         onCheckHealth={checkHealth}
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={(tab) => {
+          setActiveTab(tab);
+          if (tab === 'dashboard' || tab === 'events') {
+            setSelectedEvent(null);
+          }
+        }}
+        user={user}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onLogout={logout}
       />
 
       {/* Main Content Landmark */}
       <main id="main-content" role="main" style={{ flex: 1 }}>
         <div className="container">
-          <DashboardView
-            events={events}
-            isLoading={isLoading}
-            error={error}
-            onRetry={checkHealth}
-            onCreateEvent={() => setIsCreateModalOpen(true)}
-            onSelectEvent={handleSelectEvent}
-          />
+          {selectedEvent ? (
+            <EventDetailsView
+              event={selectedEvent}
+              onBack={() => setSelectedEvent(null)}
+              onEventUpdated={handleEventUpdated}
+              onEventDeleted={handleEventDeleted}
+            />
+          ) : (
+            <DashboardView
+              events={events}
+              isLoading={isLoadingEvents}
+              error={eventsError}
+              onRetry={loadEvents}
+              onCreateEvent={handleCreateEventClick}
+              onSelectEvent={(event) => setSelectedEvent(event)}
+            />
+          )}
         </div>
       </main>
 
@@ -88,7 +150,17 @@ const AppContent: React.FC = () => {
       <CreateEventModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateEvent}
+        onEventCreated={handleEventCreated}
+        onRequireAuth={() => {
+          setIsCreateModalOpen(false);
+          setIsAuthModalOpen(true);
+        }}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </>
   );
@@ -96,9 +168,11 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <ToastProvider>
-      <AppContent />
-    </ToastProvider>
+    <AuthProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </AuthProvider>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, Plus, Calendar, LayoutDashboard, Wallet, CheckSquare } from 'lucide-react';
+import { Sparkles, Plus, Calendar, LayoutDashboard, Wallet, CheckSquare, User, LogOut } from 'lucide-react';
+import type { UserProfile } from '@celebrateos/shared';
 import { Button } from '../ui/Button.js';
 import { Badge } from '../ui/Badge.js';
 import './Header.css';
@@ -10,6 +11,9 @@ export interface HeaderProps {
   onCheckHealth: () => void;
   activeTab?: string;
   onSelectTab?: (tab: string) => void;
+  user?: UserProfile | null;
+  onOpenAuth?: () => void;
+  onLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,6 +22,9 @@ export const Header: React.FC<HeaderProps> = ({
   onCheckHealth,
   activeTab = 'dashboard',
   onSelectTab,
+  user,
+  onOpenAuth,
+  onLogout,
 }) => {
   return (
     <header role="banner" className="celebrate-header">
@@ -97,6 +104,34 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'API Offline'}
               </Badge>
             </button>
+
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)' }}>
+                  {user.fullName}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  leftIcon={<LogOut size={14} />}
+                  onClick={onLogout}
+                  id="header-logout-btn"
+                  title="Sign Out"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<User size={14} />}
+                onClick={onOpenAuth}
+                id="header-signin-btn"
+              >
+                Sign In
+              </Button>
+            )}
 
             <Button
               variant="primary"

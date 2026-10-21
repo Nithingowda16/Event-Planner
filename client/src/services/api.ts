@@ -1,0 +1,243 @@
+import type {
+  RegisterInput,
+  LoginInput,
+  CreateEventInput,
+  UpdateEventWithVersionInput,
+  PaginationQuery,
+  UpdateBudgetItemInput,
+  BudgetRebalanceInput,
+  CreateTaskInput,
+  UpdateTaskInput,
+  CreateVendorInput,
+  UpdateVendorInput,
+  UserProfile,
+  EventEntity,
+  BudgetSummary,
+  TimelineTaskEntity,
+  VendorQuotationEntity,
+  PaginatedResponse,
+} from '@celebrateos/shared';
+
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+    public details?: unknown
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+const TOKEN_STORAGE_KEY = 'celebrateos_auth_token';
+
+let inMemoryToken: string | null = null;
+
+export const tokenStorage = {
+  get(): string | null {
+    if (inMemoryToken) return inMemoryToken;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        inMemoryToken = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+      }
+    } catch {
+      // localStorage may fail in restrictive environments
+    }
+    return inMemoryToken;
+  },
+  set(token: string): void {
+    inMemoryToken = token;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  },
+  clear(): void {
+    inMemoryToken = null;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+      }
+    } catch {
+      // Ignore
+    }
+  },
+};
+
+async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const token = tokenStorage.get();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(endpoint, {
+    ...options,
+    headers,
+  });
+
+  const contentType = res.headers.get('content-type');
+  const isJson = contentType && contentType.includes('application/json');
+  const data = isJson ? await res.json() : null;
+
+  if (!res.ok) {
+    const errorMsg = data?.message || data?.error || `HTTP error ${res.status}`;
+    throw new ApiError(res.status, errorMsg, data);
+  }
+
+  return data as T;
+}
+
+export const api = {
+  // Authentication
+  auth: {
+    async register(input: RegisterInput): Promise<{ user: UserProfile; token: string }> {
+      const result = await request<{ user: UserProfile; token: string }>('/api/v1/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+      tokenStorage.set(result.token);
+      return result;
+    },
+    async login(input: LoginInput): Promise<{ user: UserProfile; token: string }> {
+      const result = await request<{ user: UserProfile; token: string }>('/api/v1/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+      tokenStorage.set(result.token);
+      return result;
+    },
+    async getMe(): Promise<{ user: UserProfile }> {
+      return request<{ user: UserProfile }>('/api/v1/auth/me');
+    },
+    async logout(): Promise<void> {
+      try {
+        await request<{ message: string }>('/api/v1/auth/logout', { method: 'POST' });
+      } finally {
+        tokenStorage.clear();
+      }
+    },
+  },
+
+  // Event CRUD
+  events: {
+    async list(params?: Partial<PaginationQuery>): Promise<PaginatedResponse<EventEntity>> {
+      const queryParams = new URLSearchParams();
+      if (params) {
+        Object.entries(params).forEach(([key, val]) => {
+          if (val !== undefined && val !== null && String(val) !== '') {
+            queryParams.append(key, String(val));
+          }
+        });
+      }
+      const url = `/api/v1/events${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      return request<PaginatedResponse<EventEntity>>(url);
+    },
+    async create(input: CreateEventInput): Promise<{ event: EventEntity }> {
+      return request<{ event: EventEntity }>('/api/v1/events', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+    },
+    async get(id: string): Promise<{ event: EventEntity }> {
+      return request<{ event: EventEntity }>(`/api/v1/events/${id}`);
+    },
+    async update(id: string, input: UpdateEventWithVersionInput): Promise<{ event: EventEntity }> {
+      return request<{ event: EventEntity }>(`/api/v1/events/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(input),
+      });
+    },
+    async delete(id: string): Promise<{ message: string }> {
+      return request<{ message: string }>(`/api/v1/events/${id}`, {
+        method: 'DELETE',
+      });
+    },
+  },
+
+  // Authoritative Budget
+  budget: {
+    async get(eventId: string): Promise<{ budget: BudgetSummary }> {
+      return request<{ budget: BudgetSummary }>(`/api/v1/events/${eventId}/budget`);
+    },
+    async updateItem(
+      eventId: string,
+      itemId: string,
+      input: UpdateBudgetItemInput
+    ): Promise<{ budget: BudgetSummary }> {
+      return request<{ budget: BudgetSummary }>(`/api/v1/events/${eventId}/budget/items/${itemId}`, {
+        method: 'PUT',
+        body: JSON.stringify(input),
+      });
+    },
+    async rebalance(eventId: string, input: BudgetRebalanceInput): Promise<{ budget: BudgetSummary }> {
+      return request<{ budget: BudgetSummary }>(`/api/v1/events/${eventId}/budget/rebalance`, {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+    },
+  },
+
+  // Timeline Tasks
+  tasks: {
+    async list(eventId: string): Promise<{ tasks: TimelineTaskEntity[] }> {
+      return request<{ tasks: TimelineTaskEntity[] }>(`/api/v1/events/${eventId}/tasks`);
+    },
+    async create(eventId: string, input: CreateTaskInput): Promise<{ task: TimelineTaskEntity }> {
+      return request<{ task: TimelineTaskEntity }>(`/api/v1/events/${eventId}/tasks`, {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+    },
+    async update(
+      eventId: string,
+      taskId: string,
+      input: UpdateTaskInput
+    ): Promise<{ task: TimelineTaskEntity }> {
+      return request<{ task: TimelineTaskEntity }>(`/api/v1/events/${eventId}/tasks/${taskId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      });
+    },
+    async delete(eventId: string, taskId: string): Promise<{ message: string }> {
+      return request<{ message: string }>(`/api/v1/events/${eventId}/tasks/${taskId}`, {
+        method: 'DELETE',
+      });
+    },
+  },
+
+  // Vendors & Quotes
+  vendors: {
+    async list(eventId: string): Promise<{ vendors: VendorQuotationEntity[] }> {
+      return request<{ vendors: VendorQuotationEntity[] }>(`/api/v1/events/${eventId}/vendors`);
+    },
+    async create(eventId: string, input: CreateVendorInput): Promise<{ vendor: VendorQuotationEntity }> {
+      return request<{ vendor: VendorQuotationEntity }>(`/api/v1/events/${eventId}/vendors`, {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+    },
+    async update(
+      eventId: string,
+      vendorId: string,
+      input: UpdateVendorInput
+    ): Promise<{ vendor: VendorQuotationEntity }> {
+      return request<{ vendor: VendorQuotationEntity }>(`/api/v1/events/${eventId}/vendors/${vendorId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      });
+    },
+    async delete(eventId: string, vendorId: string): Promise<{ message: string }> {
+      return request<{ message: string }>(`/api/v1/events/${eventId}/vendors/${vendorId}`, {
+        method: 'DELETE',
+      });
+    },
+  },
+};

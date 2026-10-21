@@ -7,16 +7,16 @@ import { Input } from '../ui/Input.js';
 import { Select } from '../ui/Select.js';
 import { Button } from '../ui/Button.js';
 import { Spinner } from '../ui/Spinner.js';
-import type { DashboardEventItem } from '../../types/index.js';
+import type { EventEntity } from '@celebrateos/shared';
 import './DashboardView.css';
 
 export interface DashboardViewProps {
-  events: DashboardEventItem[];
+  events: EventEntity[];
   isLoading: boolean;
   error?: string | null;
   onRetry: () => void;
   onCreateEvent: () => void;
-  onSelectEvent: (event: DashboardEventItem) => void;
+  onSelectEvent: (event: EventEntity) => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({

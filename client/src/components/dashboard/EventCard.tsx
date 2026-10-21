@@ -3,12 +3,13 @@ import { Calendar, Users, MapPin, ArrowRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardBody, CardFooter } from '../ui/Card.js';
 import { Badge } from '../ui/Badge.js';
 import { Button } from '../ui/Button.js';
-import type { DashboardEventItem, BadgeVariant } from '../../types/index.js';
+import type { EventEntity } from '@celebrateos/shared';
+import type { BadgeVariant } from '../../types/index.js';
 import './EventCard.css';
 
 export interface EventCardProps {
-  event: DashboardEventItem;
-  onSelect?: (event: DashboardEventItem) => void;
+  event: EventEntity;
+  onSelect?: (event: EventEntity) => void;
 }
 
 const eventTypeBadgeMap: Record<string, { label: string; variant: BadgeVariant }> = {

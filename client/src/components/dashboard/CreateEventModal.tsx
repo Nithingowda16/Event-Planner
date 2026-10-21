@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
-import type { EventType } from '@celebrateos/shared';
+import type { EventType, CreateEventInput, EventEntity } from '@celebrateos/shared';
 import { Modal } from '../ui/Modal.js';
 import { Input } from '../ui/Input.js';
 import { Select } from '../ui/Select.js';
 import { Button } from '../ui/Button.js';
-import type { DashboardEventItem } from '../../types/index.js';
+import { api, ApiError } from '../../services/api.js';
+import { useAuth } from '../../context/AuthContext.js';
 
 export interface CreateEventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (eventData: Omit<DashboardEventItem, 'id' | 'version'>) => void;
+  onEventCreated: (event: EventEntity) => void;
+  onRequireAuth?: () => void;
 }
 
 export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   isOpen,
   onClose,
-  onSubmit,
+  onEventCreated,
+  onRequireAuth,
 }) => {
+  const { isAuthenticated } = useAuth();
   const [title, setTitle] = useState('');
   const [eventType, setEventType] = useState<EventType>('wedding');
   const [eventDate, setEventDate] = useState<string>(() => {
@@ -29,10 +33,14 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [totalBudget, setTotalBudget] = useState('15000');
   const [currency, setCurrency] = useState<string>('USD');
 
-  // Validation errors
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  // Client validation errors
   const [errors, setErrors] = useState<{
     title?: string;
     eventDate?: string;
+    location?: string;
     guestCount?: string;
     totalBudget?: string;
   }>({});
@@ -44,6 +52,9 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }
     if (!eventDate) {
       newErrors.eventDate = 'Event date is required.';
+    }
+    if (!location.trim() || location.trim().length < 2) {
+      newErrors.location = 'Location is required (at least 2 characters).';
     }
     const parsedGuests = parseInt(guestCount, 10);
     if (isNaN(parsedGuests) || parsedGuests <= 0) {
@@ -58,31 +69,49 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
+
+    if (!isAuthenticated) {
+      onRequireAuth?.();
+      return;
+    }
+
     if (!validate()) return;
 
-    onSubmit({
-      title: title.trim(),
-      eventType,
-      eventDate,
-      location: location.trim(),
-      guestCount: parseInt(guestCount, 10),
-      totalBudget: parseFloat(totalBudget),
-      currency,
-    });
+    setIsSubmitting(true);
+    try {
+      const payload: CreateEventInput = {
+        title: title.trim(),
+        eventType,
+        eventDate: new Date(eventDate).toISOString(),
+        location: location.trim(),
+        guestCount: parseInt(guestCount, 10),
+        totalBudget: parseFloat(totalBudget),
+        currency,
+        preferences: {},
+      };
 
-    onClose();
+      const result = await api.events.create(payload);
+      onEventCreated(result.event);
+      onClose();
+      // Reset form
+      setTitle('');
+      setLocation('');
+    } catch (err: unknown) {
+      const msg = err instanceof ApiError ? err.message : 'Failed to create celebration on server';
+      setServerError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const eventTypeOptions = [
     { value: 'wedding', label: 'Wedding' },
     { value: 'birthday', label: 'Birthday' },
-    { value: 'anniversary', label: 'Anniversary' },
     { value: 'community', label: 'Community Festival' },
     { value: 'corporate', label: 'Corporate Event' },
-    { value: 'baby_shower', label: 'Baby Shower' },
-    { value: 'graduation', label: 'Graduation' },
     { value: 'other', label: 'Other Celebration' },
   ];
 
@@ -102,19 +131,21 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Create New Celebration"
-      description="Define celebration parameters for local UI preview. Server persistence, AI generation, and authoritative budget sync will be connected in Milestone 6."
+      description="Persist a new celebration to MongoDB with authoritative budget allocation and timeline initialization."
       footer={
         <>
-          <Button variant="ghost" onClick={onClose} id="cancel-create-event-btn">
+          <Button variant="ghost" onClick={onClose} disabled={isSubmitting} id="cancel-create-event-btn">
             Cancel
           </Button>
           <Button
             variant="primary"
             type="submit"
             form="create-event-form"
+            isLoading={isSubmitting}
+            loadingText="Persisting..."
             id="submit-create-event-btn"
           >
-            Create Celebration (Preview)
+            Create Celebration
           </Button>
         </>
       }
@@ -125,6 +156,22 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
         noValidate
         style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
       >
+        {serverError && (
+          <div
+            role="alert"
+            style={{
+              padding: 'var(--space-3)',
+              backgroundColor: 'var(--accent-rose-soft)',
+              border: '1px solid rgba(251, 113, 133, 0.4)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--accent-rose)',
+              fontSize: 'var(--font-size-sm)',
+            }}
+          >
+            {serverError}
+          </div>
+        )}
+
         <Input
           id="event-title-input"
           label="Celebration Title"
@@ -132,6 +179,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
+          disabled={isSubmitting}
           error={errors.title}
           helperText="Give your celebration a memorable name"
         />
@@ -144,6 +192,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onChange={(e) => setEventType(e.target.value as EventType)}
             options={eventTypeOptions}
             required
+            disabled={isSubmitting}
           />
 
           <Input
@@ -153,16 +202,20 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             value={eventDate}
             onChange={(e) => setEventDate(e.target.value)}
             required
+            disabled={isSubmitting}
             error={errors.eventDate}
           />
         </div>
 
         <Input
           id="event-location-input"
-          label="Location or Venue (Optional)"
+          label="Location or Venue"
           placeholder="e.g. Botanical Gardens, San Francisco"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
+          required
+          disabled={isSubmitting}
+          error={errors.location}
           helperText="Where will this celebration take place?"
         />
 
@@ -175,6 +228,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             value={guestCount}
             onChange={(e) => setGuestCount(e.target.value)}
             required
+            disabled={isSubmitting}
             error={errors.guestCount}
           />
 
@@ -185,6 +239,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onChange={(e) => setCurrency(e.target.value)}
             options={currencyOptions}
             required
+            disabled={isSubmitting}
           />
         </div>
 
@@ -197,8 +252,9 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
           value={totalBudget}
           onChange={(e) => setTotalBudget(e.target.value)}
           required
+          disabled={isSubmitting}
           error={errors.totalBudget}
-          helperText="Authoritative server calculations prevent floating-point drift"
+          helperText="Authoritative server calculations guarantee exact total invariant"
         />
       </form>
     </Modal>
