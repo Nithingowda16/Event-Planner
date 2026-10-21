@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# Coverage & test artifacts
+coverage/
+.nyc_output/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Antigravity / IDE settings
+.vscode/
+.idea/
+
+# Local runner shims
+powershell.cmd

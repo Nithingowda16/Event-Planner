@@ -1,0 +1,35 @@
+{
+  "name": "celebrateos-root",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CelebrateOS — AI-Powered Celebration & Event Planner (MERN + TypeScript)",
+  "workspaces": [
+    "packages/*",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run --workspace=@celebrateos/shared build && npm run --workspace=@celebrateos/server build && npm run --workspace=@celebrateos/client build",
+    "typecheck": "npm run --workspace=@celebrateos/shared typecheck && npm run --workspace=@celebrateos/server typecheck && npm run --workspace=@celebrateos/client typecheck",
+    "lint": "eslint .",
+    "test": "npm run --workspace=@celebrateos/server test && npm run --workspace=@celebrateos/client test",
+    "dev:server": "npm run --workspace=@celebrateos/server dev",
+    "dev:client": "npm run --workspace=@celebrateos/client dev"
+  },
+  "keywords": [
+    "celebrateos",
+    "event-planner",
+    "generative-ai",
+    "gemini",
+    "mern",
+    "typescript"
+  ],
+  "author": "Antigravity Engineering Council",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "typescript-eslint": "^8.72.0"
+  }
+}
