@@ -1,18 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import type { EventEntity } from '@celebrateos/shared';
 import { Header } from './components/layout/Header.js';
 import { Footer } from './components/layout/Footer.js';
 import { Sidebar } from './components/layout/Sidebar.js';
-import { LandingPage } from './components/landing/LandingPage.js';
 import { DashboardView } from './components/dashboard/DashboardView.js';
-import { EventDetailsView } from './components/events/EventDetailsView.js';
 import { CreateEventModal } from './components/dashboard/CreateEventModal.js';
 import { AuthModal } from './components/auth/AuthModal.js';
+import { Spinner } from './components/ui/Spinner.js';
 import { ToastProvider, useToast } from './components/ui/ToastContext.js';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { ThemeProvider } from './context/ThemeContext.js';
 import { api, ApiError, API_BASE_URL } from './services/api.js';
 import './styles/global.css';
+
+const LandingPage = lazy(() =>
+  import('./components/landing/LandingPage.js').then((m) => ({ default: m.LandingPage }))
+);
+
+const EventDetailsView = lazy(() =>
+  import('./components/events/EventDetailsView.js').then((m) => ({ default: m.EventDetailsView }))
+);
 
 const AppContent: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -151,10 +158,26 @@ const AppContent: React.FC = () => {
           </a>
 
           {/* Public Landing Page */}
-          <LandingPage
-            onOpenLogin={handleOpenLogin}
-            onOpenRegister={handleOpenRegister}
-          />
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '60vh',
+                  padding: '2rem',
+                }}
+              >
+                <Spinner size="lg" label="Loading Swakarya..." />
+              </div>
+            }
+          >
+            <LandingPage
+              onOpenLogin={handleOpenLogin}
+              onOpenRegister={handleOpenRegister}
+            />
+          </Suspense>
         </>
       ) : (
         <>
@@ -187,12 +210,28 @@ const AppContent: React.FC = () => {
             <main id="main-content" role="main" style={{ flex: 1 }}>
               <div className="container">
                 {selectedEvent ? (
-                  <EventDetailsView
-                    event={selectedEvent}
-                    onBack={() => setSelectedEvent(null)}
-                    onEventUpdated={handleEventUpdated}
-                    onEventDeleted={handleEventDeleted}
-                  />
+                  <Suspense
+                    fallback={
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minHeight: '300px',
+                          padding: '2rem',
+                        }}
+                      >
+                        <Spinner size="lg" label="Loading celebration workspace..." />
+                      </div>
+                    }
+                  >
+                    <EventDetailsView
+                      event={selectedEvent}
+                      onBack={() => setSelectedEvent(null)}
+                      onEventUpdated={handleEventUpdated}
+                      onEventDeleted={handleEventDeleted}
+                    />
+                  </Suspense>
                 ) : (
                   <DashboardView
                     events={events}

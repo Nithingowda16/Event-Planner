@@ -5,7 +5,22 @@ import { envConfig } from '../../server/src/config/env.js';
 
 const expressHandler = serverless(app);
 
-export const handler = async (event: any, context: any) => {
+export interface NetlifyFunctionEvent {
+  path?: string;
+  httpMethod?: string;
+  headers?: Record<string, string | undefined>;
+  queryStringParameters?: Record<string, string | undefined>;
+  body?: string | null;
+  isBase64Encoded?: boolean;
+  [key: string]: unknown;
+}
+
+export interface NetlifyFunctionContext {
+  callbackWaitsForEmptyEventLoop?: boolean;
+  [key: string]: unknown;
+}
+
+export const handler = async (event: NetlifyFunctionEvent, context: NetlifyFunctionContext) => {
   // Allow the database connection to be reused between warm invocations.
   context.callbackWaitsForEmptyEventLoop = false;
 

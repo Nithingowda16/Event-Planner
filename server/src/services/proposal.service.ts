@@ -182,27 +182,33 @@ export async function rejectProposal(userId: string, proposalId: string): Promis
  */
 export async function validateProposalForApproval(
   userId: string,
-  proposalId: string,
+  proposalOrId: string | IPlanProposal,
   expectedVersion?: number
 ): Promise<{ proposal: IPlanProposal; event: InstanceType<typeof Event> }> {
-  if (!mongoose.Types.ObjectId.isValid(proposalId)) {
-    throw new ProposalServiceError(404, 'Proposal not found');
-  }
+  let proposal: IPlanProposal | null;
 
-  const proposal = await PlanProposal.findOne({
-    _id: new mongoose.Types.ObjectId(proposalId),
-    userId: new mongoose.Types.ObjectId(userId),
-  });
+  if (typeof proposalOrId === 'string') {
+    if (!mongoose.Types.ObjectId.isValid(proposalOrId)) {
+      throw new ProposalServiceError(404, 'Proposal not found');
+    }
 
-  if (!proposal) {
-    throw new ProposalServiceError(404, 'Proposal not found');
-  }
+    proposal = await PlanProposal.findOne({
+      _id: new mongoose.Types.ObjectId(proposalOrId),
+      userId: new mongoose.Types.ObjectId(userId),
+    });
 
-  if (proposal.status !== 'pending') {
-    throw new ProposalServiceError(
-      400,
-      `Cannot review proposal with status "${proposal.status}". Only pending proposals can be reviewed.`
-    );
+    if (!proposal) {
+      throw new ProposalServiceError(404, 'Proposal not found');
+    }
+
+    if (proposal.status !== 'pending') {
+      throw new ProposalServiceError(
+        400,
+        `Cannot review proposal with status "${proposal.status}". Only pending proposals can be reviewed.`
+      );
+    }
+  } else {
+    proposal = proposalOrId;
   }
 
   const event = await Event.findOne({
@@ -287,7 +293,7 @@ export async function approveProposal(
   // 2. Validate event and version concurrency
   let eventDoc: InstanceType<typeof Event>;
   try {
-    const validated = await validateProposalForApproval(userId, proposalId, expectedVersion);
+    const validated = await validateProposalForApproval(userId, claimedProposal, expectedVersion);
     eventDoc = validated.event;
   } catch (validationErr) {
     claimedProposal.isApplying = false;

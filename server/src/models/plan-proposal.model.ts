@@ -69,5 +69,6 @@ const PlanProposalSchema = new Schema<IPlanProposal>(
 // Compound Indexes for fast tenant access and proposal status lookups
 PlanProposalSchema.index({ eventId: 1, status: 1 });
 PlanProposalSchema.index({ userId: 1, createdAt: -1 });
+PlanProposalSchema.index({ eventId: 1, userId: 1, createdAt: -1 });
 
 export const PlanProposal = mongoose.model<IPlanProposal>('PlanProposal', PlanProposalSchema);
