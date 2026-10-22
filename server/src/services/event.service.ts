@@ -259,22 +259,10 @@ export async function deleteEvent(userId: string, eventId: string): Promise<void
 }
 
 /**
- * Retrieves the budget breakdown for an event.
+ * Transforms an event document into the authoritative budget summary response.
+ * Preserves the exact response structure, rounding, currency, and item schema.
  */
-export async function getEventBudget(userId: string, eventId: string): Promise<BudgetSummary & { currency: string }> {
-  if (!mongoose.Types.ObjectId.isValid(eventId)) {
-    throw new EventServiceError(404, 'Event not found');
-  }
-
-  const event = await Event.findOne({
-    _id: new mongoose.Types.ObjectId(eventId),
-    userId: new mongoose.Types.ObjectId(userId),
-  });
-
-  if (!event) {
-    throw new EventServiceError(404, 'Event not found');
-  }
-
+export function formatBudgetSummary(event: IEvent): BudgetSummary & { currency: string } {
   const totalAllocated = event.budgetItems.reduce((acc, curr) => acc + curr.allocatedAmount, 0);
   const totalSpent = event.budgetItems.reduce((acc, curr) => acc + curr.actualSpent, 0);
   const remainingUnallocated = Math.round((event.totalBudget - totalAllocated) * 100) / 100;
@@ -298,6 +286,26 @@ export async function getEventBudget(userId: string, eventId: string): Promise<B
       isLocked: item.isLocked,
     })),
   };
+}
+
+/**
+ * Retrieves the budget breakdown for an event.
+ */
+export async function getEventBudget(userId: string, eventId: string): Promise<BudgetSummary & { currency: string }> {
+  if (!mongoose.Types.ObjectId.isValid(eventId)) {
+    throw new EventServiceError(404, 'Event not found');
+  }
+
+  const event = await Event.findOne({
+    _id: new mongoose.Types.ObjectId(eventId),
+    userId: new mongoose.Types.ObjectId(userId),
+  });
+
+  if (!event) {
+    throw new EventServiceError(404, 'Event not found');
+  }
+
+  return formatBudgetSummary(event);
 }
 
 /**
@@ -367,7 +375,7 @@ export async function updateBudgetItem(
   }
 
   await event.save();
-  return getEventBudget(userId, eventId);
+  return formatBudgetSummary(event);
 }
 
 /**
@@ -416,5 +424,5 @@ export async function rebalanceEventBudget(
   }));
 
   await event.save();
-  return getEventBudget(userId, eventId);
+  return formatBudgetSummary(event);
 }

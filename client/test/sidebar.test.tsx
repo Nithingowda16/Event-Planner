@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Sidebar, getInitials } from '../src/components/layout/Sidebar.js';
-import { Header } from '../src/components/layout/Header.js';
 import { ThemeProvider } from '../src/context/ThemeContext.js';
 
 describe('Left Collapsible Sidebar & Mini-Rail Navigation', () => {

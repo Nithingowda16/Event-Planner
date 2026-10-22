@@ -13,21 +13,19 @@ export class VendorServiceError extends Error {
 /**
  * Ensures the event exists and belongs to the authenticated user.
  */
-async function assertEventOwnership(userId: string, eventId: string) {
+async function assertEventOwnership(userId: string, eventId: string): Promise<void> {
   if (!mongoose.Types.ObjectId.isValid(eventId) || !mongoose.Types.ObjectId.isValid(userId)) {
     throw new VendorServiceError(404, 'Event not found');
   }
 
-  const event = await Event.findOne({
+  const exists = await Event.exists({
     _id: new mongoose.Types.ObjectId(eventId),
     userId: new mongoose.Types.ObjectId(userId),
   });
 
-  if (!event) {
+  if (!exists) {
     throw new VendorServiceError(404, 'Event not found');
   }
-
-  return event;
 }
 
 /**

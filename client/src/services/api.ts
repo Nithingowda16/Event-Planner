@@ -96,7 +96,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       ...options,
       headers,
     });
-  } catch (_netErr: unknown) {
+  } catch {
     throw new ApiError(
       0,
       'Unable to connect to the backend server. Please check your internet connection or backend server status.'
